@@ -26,24 +26,24 @@ const features = [
     href: "/dictionary",
     gradient: "from-blue-500 to-cyan-400",
   },
-  {
-    title: "BÀI TẬP",
-    englishTitle: "Bài tập cá nhân hóa",
-    description:
-      "Luyện tập với các bài kiểm tra được điều chỉnh theo trình độ và sở thích của bạn.",
-    icon: GraduationCap,
-    href: "/assignment",
-    gradient: "from-purple-500 to-pink-400",
-  },
-  {
-    title: "LUYỆN VIẾT",
-    englishTitle: "Thực hành viết",
-    description:
-      "Nhận phản hồi và gợi ý ngay lập tức để cải thiện kỹ năng viết tiếng Anh.",
-    icon: PenLine,
-    href: "/writing",
-    gradient: "from-green-500 to-emerald-400",
-  },
+  // {
+  //   title: "BÀI TẬP",
+  //   englishTitle: "Bài tập cá nhân hóa",
+  //   description:
+  //     "Luyện tập với các bài kiểm tra được điều chỉnh theo trình độ và sở thích của bạn.",
+  //   icon: GraduationCap,
+  //   href: "/assignment",
+  //   gradient: "from-purple-500 to-pink-400",
+  // },
+  // {
+  //   title: "LUYỆN VIẾT",
+  //   englishTitle: "Thực hành viết",
+  //   description:
+  //     "Nhận phản hồi và gợi ý ngay lập tức để cải thiện kỹ năng viết tiếng Anh.",
+  //   icon: PenLine,
+  //   href: "/writing",
+  //   gradient: "from-green-500 to-emerald-400",
+  // },
   {
     title: "TƯ VẤN",
     englishTitle: "Trò chuyện với gia sư ảo",
@@ -65,10 +65,10 @@ export default function Dashboard() {
   const [updateInfo, setUpdateInfo] = useState<GitHubCommit | null>(null);
 
   useEffect(() => {
-    if (!preferences.hasCompletedOnboarding) {
-      router.push("/");
-      return;
-    }
+    // if (!preferences.hasCompletedOnboarding) {
+    //   router.push("/");
+    //   return;
+    // }
 
     // Show info dialog if user hasn't seen it before
     const hasSeenInfo = localStorage.getItem("hasSeenInfo");
@@ -113,7 +113,9 @@ export default function Dashboard() {
     setIsCheckingUpdate(true);
     try {
       const lastShaCode = localStorage.getItem("lastShaCode");
-      const response = await fetch(`${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`);
+      const response = await fetch(
+        `${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`
+      );
       const data: GitHubCommit = await response.json();
 
       if (!lastShaCode || lastShaCode !== data.ShaCode) {
@@ -157,12 +159,20 @@ export default function Dashboard() {
         onClose={() => setShowUpdateDialog(false)}
         title="Cập nhật mới"
         loading={isCheckingUpdate}
-        content={updateInfo ? `${updateInfo.Message}
+        content={
+          updateInfo
+            ? `${updateInfo.Message}
 
 ---
 
-Cập nhật vào lúc **${formatUpdateDate(updateInfo.Date)}**. Thông tin chi tiết tại [**ĐÂY**](https://github.com/phanxuanquang/EngAce/commit/${updateInfo.ShaCode}).
-        `.trim() : ""}
+Cập nhật vào lúc **${formatUpdateDate(
+                updateInfo.Date
+              )}**. Thông tin chi tiết tại [**ĐÂY**](https://github.com/phanxuanquang/EngAce/commit/${
+                updateInfo.ShaCode
+              }).
+        `.trim()
+            : ""
+        }
         showGithubButton={true}
       />
 
