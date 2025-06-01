@@ -117,7 +117,7 @@ export default function OnboardingForm() {
               <Input
                 {...register("fullName")}
                 autoComplete="off"
-                placeholder="Quang đẹp trai"
+                placeholder="Nhập tên của bạn"
                 disabled={isLoading}
               />
               {errors.fullName && (
