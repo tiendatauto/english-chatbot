@@ -24,10 +24,9 @@ const formSchema = z.object({
     .number()
     .min(7, "Người dùng phải từ 7 tuổi trở lên")
     .max(60, "Người dùng phải dưới 60 tuổi"),
-  geminiApiKey: z
-    .string()
-    .min(39, "API key không hợp lệ")
-    .regex(/^AIza/, "API key phải bắt đầu bằng 'AIza'"),
+  geminiApiKey: z.string(),
+  // .min(39, "API key không hợp lệ")
+  // .regex(/^AIza/, "API key phải bắt đầu bằng 'AIza'"),
 });
 
 type FormData = z.infer<typeof formSchema>;
