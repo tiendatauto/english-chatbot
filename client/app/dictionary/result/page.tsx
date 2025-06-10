@@ -45,7 +45,7 @@ function DictionaryResultContent() {
         setIsLoading(true);
         setError(null);
 
-        const preferences = getUserPreferences();
+        // const preferences = getUserPreferences();
         // if (!preferences.geminiApiKey) {
         //   throw new Error(
         //     "API key not found. Please complete the onboarding process."
