@@ -4,6 +4,7 @@ import serverless from 'serverless-http'
 
 const app = express()
 const server = new Server(app)
+server.setup()
 
 export const handler = serverless(server.getApp())
 export default handler
