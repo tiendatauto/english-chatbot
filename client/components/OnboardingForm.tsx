@@ -29,7 +29,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function OnboardingForm() {
-  const [error, setError] = useState<string>("");
+  // const [error, setError] = useState<string>("");
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ export default function OnboardingForm() {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      setError("");
+      // setError("");
 
       // Health check API call
       const response = await fetch(`${API_DOMAIN}/api/Healthcheck`, {
@@ -70,12 +70,12 @@ export default function OnboardingForm() {
       // If health check succeeds, proceed
       setFormData(data);
       setCurrentStep(2);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "API key validation failed. Please check your key and try again."
-      );
+    } catch {
+      // setError(
+      //   err instanceof Error
+      //     ? err.message
+      //     : "API key validation failed. Please check your key and try again."
+      // );
     } finally {
       setIsLoading(false);
     }
