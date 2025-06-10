@@ -11,6 +11,10 @@ class Server {
     this.app = app
   }
 
+  public getApp(): Application {
+    return this.app
+  }
+
   public start(): void {
     this.setupMiddleware()
     this.setupRoutes()
