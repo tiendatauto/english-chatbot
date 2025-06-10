@@ -46,11 +46,11 @@ function DictionaryResultContent() {
         setError(null);
 
         const preferences = getUserPreferences();
-        if (!preferences.geminiApiKey) {
-          throw new Error(
-            "API key not found. Please complete the onboarding process."
-          );
-        }
+        // if (!preferences.geminiApiKey) {
+        //   throw new Error(
+        //     "API key not found. Please complete the onboarding process."
+        //   );
+        // }
 
         // Construct search URL with parameters
         const searchUrl = new URL(`${API_DOMAIN}/api/dictionary`);

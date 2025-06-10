@@ -170,7 +170,9 @@ export default function ChatPage2() {
   // };
 
   const handleSend = async (message = inputMessage) => {
-    if (!message.trim() || !transcript || isProcessing) return;
+    if ((!message.trim() && !transcript) || isProcessing) {
+      return;
+    }
 
     const imageUrls =
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
