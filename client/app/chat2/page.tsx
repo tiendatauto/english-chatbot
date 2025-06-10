@@ -151,23 +151,23 @@ export default function ChatPage2() {
     setSelectedImages((prev) => [...prev, ...newFiles]);
   };
 
-  const convertImagesToBase64 = async (images: File[]): Promise<string[]> => {
-    const base64Promises = images.map((image) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to convert image to base64"));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(image);
-      });
-    });
-    return Promise.all(base64Promises);
-  };
+  // const convertImagesToBase64 = async (images: File[]): Promise<string[]> => {
+  //   const base64Promises = images.map((image) => {
+  //     return new Promise<string>((resolve, reject) => {
+  //       const reader = new FileReader();
+  //       reader.onload = () => {
+  //         if (typeof reader.result === "string") {
+  //           resolve(reader.result);
+  //         } else {
+  //           reject(new Error("Failed to convert image to base64"));
+  //         }
+  //       };
+  //       reader.onerror = reject;
+  //       reader.readAsDataURL(image);
+  //     });
+  //   });
+  //   return Promise.all(base64Promises);
+  // };
 
   const handleSend = async (message = inputMessage) => {
     if (!message.trim() || !transcript || isProcessing) return;
@@ -191,15 +191,15 @@ export default function ChatPage2() {
     setAudioURL(null);
     try {
       // Format chat history for API
-      const chatHistory = messages.map((msg) => ({
-        FromUser: msg.sender === "user",
-        Message: msg.content,
-      }));
+      // const chatHistory = messages.map((msg) => ({
+      //   FromUser: msg.sender === "user",
+      //   Message: msg.content,
+      // }));
 
-      const imagesAsBase64 =
-        selectedImages.length > 0
-          ? await convertImagesToBase64(selectedImages)
-          : undefined;
+      // const imagesAsBase64 =
+      //   selectedImages.length > 0
+      //     ? await convertImagesToBase64(selectedImages)
+      //     : undefined;
 
       // const requestData = {
       //   ChatHistory: [

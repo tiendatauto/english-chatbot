@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Book, PenLine, GraduationCap, MessageCircle } from "lucide-react";
+import { Book, MessageCircle } from "lucide-react";
 import { getUserPreferences } from "@/lib/localStorage";
-import { API_DOMAIN } from "@/lib/config";
+// import { API_DOMAIN } from "@/lib/config";
 import Navbar from "@/components/Navbar";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import InfoDialog from "@/components/InfoDialog";
 import { FEEDBACK_DIALOG_INTERVAL_DAYS } from "@/lib/constants";
 
-interface GitHubCommit {
-  ShaCode: string;
-  Message: string;
-  Date: string;
-}
+// interface GitHubCommit {
+//   ShaCode: string;
+//   Message: string;
+//   Date: string;
+// }
 
 const features = [
   {
@@ -59,10 +59,10 @@ export default function Dashboard() {
   const router = useRouter();
   const preferences = getUserPreferences();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  // const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
-  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
-  const [updateInfo, setUpdateInfo] = useState<GitHubCommit | null>(null);
+  // const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  // const [updateInfo, setUpdateInfo] = useState<GitHubCommit | null>(null);
 
   useEffect(() => {
     // if (!preferences.hasCompletedOnboarding) {
@@ -110,14 +110,13 @@ export default function Dashboard() {
   }, [preferences.hasCompletedOnboarding]);
 
   const checkForUpdates = async () => {
-    setIsCheckingUpdate(true);
+    // setIsCheckingUpdate(true);
     try {
-      const lastShaCode = localStorage.getItem("lastShaCode");
+      // const lastShaCode = localStorage.getItem("lastShaCode");
       // const response = await fetch(
       //   `${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`
       // );
       // const data: GitHubCommit = await response.json();
-
       // if (!lastShaCode || lastShaCode !== data.ShaCode) {
       //   setUpdateInfo(data);
       //   setShowUpdateDialog(true);
@@ -126,19 +125,19 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Failed to check for updates:", error);
     } finally {
-      setIsCheckingUpdate(false);
+      // setIsCheckingUpdate(false);
     }
   };
 
-  const formatUpdateDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("vi-VN", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-    });
-  };
+  // const formatUpdateDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleString("vi-VN", {
+  //     day: "numeric",
+  //     month: "numeric",
+  //     year: "numeric",
+  //     hour: "numeric",
+  //     minute: "numeric",
+  //   });
+  // };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50/95 via-purple-50/98 to-slate-100/95 dark:from-slate-950/95 dark:via-purple-900/40 dark:to-slate-950/95 transition-all duration-1000">
@@ -154,7 +153,7 @@ export default function Dashboard() {
       />
 
       {/* Update Dialog */}
-      <InfoDialog
+      {/* <InfoDialog
         isOpen={showUpdateDialog}
         onClose={() => setShowUpdateDialog(false)}
         title="Cập nhật mới"
@@ -174,7 +173,7 @@ Cập nhật vào lúc **${formatUpdateDate(
             : ""
         }
         showGithubButton={true}
-      />
+      /> */}
 
       {/* Feedback Dialog */}
       <FeedbackDialog

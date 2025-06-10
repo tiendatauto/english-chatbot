@@ -12,7 +12,7 @@ const isBrowser = typeof window !== "undefined";
 
 interface DictionaryResponse {
   content: string;
-  audioUrls: string | null;
+  audioUrls: { us: string };
 }
 
 function DictionaryResultContent() {
