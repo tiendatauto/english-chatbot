@@ -5,9 +5,9 @@ import dictionaryRoute from '~/features/dictionary/route/dictionary.route'
 
 const appRoutes = (app: Application) => {
   // app.use('/api/v1/users', userRoute)
-  // app.use('/api', (req: Request, res: Response) => {
-  //   return res.status(HTTP_STATUS.OK).json('connected successfully')
-  // })
+  app.use('/api/Healthcheck', (req: Request, res: Response) => {
+    res.status(HTTP_STATUS.OK).json('connected successfully')
+  })
   app.use('/api/chat', chatRoute)
   app.use('/api/dictionary', dictionaryRoute)
 }
