@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import ChatMessages from "../chat/components/ChatMessages";
 import ChatInput from "../chat/components/ChatInput";
-import ChatControls from "../chat/components/ChatControls";
+// import ChatControls from "../chat/components/ChatControls";
 import FirstVisitGuide from "../chat/components/FirstVisitGuide";
 import Suggestions from "../chat/components/Suggestions";
 import SpeechRecognition, {
@@ -28,13 +28,14 @@ export default function ChatPage2() {
   const [isClearing, setIsClearing] = useState(false);
   const [hasRestoredMessages, setHasRestoredMessages] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [enableReasoning, setEnableReasoning] = useState(false);
-  const [enableSearching, setEnableSearching] = useState(false);
+  const [initMessage, setInitMessage] = useState(true);
+  // const [enableReasoning, setEnableReasoning] = useState(false);
+  // const [enableSearching, setEnableSearching] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const preferences = getUserPreferences();
-  const { speak } = useSpeechSynthesis();
+  const { speak, cancel } = useSpeechSynthesis();
   const { transcript, listening, resetTranscript } = useSpeechRecognition();
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -75,22 +76,24 @@ export default function ChatPage2() {
       } catch (error) {
         console.error("Error loading chat history:", error);
       }
-    } else if (!hasRestoredMessages) {
+    } else if (!hasRestoredMessages || initMessage) {
       setMessages([
         {
           id: "welcome",
-          content: `Chào ${preferences.fullName}! Mình là EngAce, trợ lý ảo được thiết kế riêng để hỗ trợ bạn học tiếng Anh nè. 😊\n\nMình luôn cố gắng hỗ trợ bạn tốt nhất, nhưng đôi khi vẫn có thể mắc sai sót, nên bạn nhớ kiểm tra lại những thông tin quan trọng nha!`,
+          content: `Chào ${preferences.fullName}! Mình là Đạt đẹp troai, trợ lý ảo được thiết kế riêng để hỗ trợ bạn học tiếng Anh nè. 😊\n\nMình luôn cố gắng hỗ trợ bạn tốt nhất, nhưng đôi khi vẫn có thể mắc sai sót, nên bạn nhớ kiểm tra lại những thông tin quan trọng nha!`,
           sender: "ai",
           timestamp: new Date(),
         },
       ]);
     }
     setHasRestoredMessages(true);
+    setInitMessage(false);
   }, [
     router,
     preferences.hasCompletedOnboarding,
     hasRestoredMessages,
     preferences.fullName,
+    initMessage,
   ]);
 
   // Save messages to localStorage whenever they change
@@ -110,6 +113,7 @@ export default function ChatPage2() {
   const handleClearChat = () => {
     setMessages([]);
     setCurrentSuggestions([]);
+    setInitMessage(true);
   };
 
   const getImageUrls = (images: File[]): string[] => {
@@ -178,7 +182,7 @@ export default function ChatPage2() {
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: message,
+      content: message || transcript,
       sender: "user",
       timestamp: new Date(),
       images: imageUrls,
@@ -242,8 +246,8 @@ export default function ChatPage2() {
 
       setSelectedImages([]);
 
-      setEnableReasoning(false);
-      setEnableSearching(false);
+      // setEnableReasoning(false);
+      // setEnableSearching(false);
 
       const response = await fetch(url.toString(), {
         method: "POST",
@@ -288,9 +292,16 @@ export default function ChatPage2() {
   };
 
   const startRecording = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert(
+        "Trình duyệt không hỗ trợ ghi âm (getUserMedia). Vui lòng dùng Chrome trên Android hoặc Safari mới nhất."
+      );
+      return;
+    }
+    cancel();
     resetTranscript();
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorderRef.current = new MediaRecorder(stream);
+    mediaRecorderRef.current = stream && new MediaRecorder(stream);
     audioChunksRef.current = [];
 
     mediaRecorderRef.current.ondataavailable = (event) => {
@@ -307,8 +318,6 @@ export default function ChatPage2() {
 
     mediaRecorderRef.current.start();
     SpeechRecognition.startListening({ continuous: true });
-    // SpeechRecognition.startListening();
-    // mediaRecorderRef.current?.stop();
   };
 
   // Dừng ghi âm
@@ -361,7 +370,7 @@ export default function ChatPage2() {
               setSelectedImages((prev) => prev.filter((_, i) => i !== index))
             }
           />
-          <ChatControls
+          {/* <ChatControls
             onImageClick={() => fileInputRef.current?.click()}
             enableReasoning={enableReasoning}
             onReasoningToggle={() => {
@@ -373,16 +382,27 @@ export default function ChatPage2() {
               setEnableSearching(!enableSearching);
               if (!enableSearching) setEnableReasoning(false);
             }}
-          />
+          /> */}
           {/* <button onClick={() => SpeechRecognition.startListening()}>
             🎙️ Speak
           </button> */}
-          <button onClick={startRecording} disabled={listening}>
-            🎙️ Start Speaking
-          </button>
-          <button onClick={stopRecording} disabled={!listening}>
-            🛑 Stop
-          </button>
+          <div className="flex justify-between items-center gap-x-4">
+            <button
+              onClick={startRecording}
+              disabled={listening}
+              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+            >
+              🎙️ Start Speaking
+            </button>
+            <button
+              onClick={stopRecording}
+              disabled={!listening}
+              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+            >
+              🛑 Stop
+            </button>
+          </div>
+
           <p>Status: {listening ? "🎤 Listening..." : "🛑 Not Listening"}</p>
 
           {audioURL && (
