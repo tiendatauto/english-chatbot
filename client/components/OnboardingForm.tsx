@@ -24,9 +24,6 @@ const formSchema = z.object({
     .number()
     .min(7, "Người dùng phải từ 7 tuổi trở lên")
     .max(60, "Người dùng phải dưới 60 tuổi"),
-  geminiApiKey: z.string(),
-  // .min(39, "API key không hợp lệ")
-  // .regex(/^AIza/, "API key phải bắt đầu bằng 'AIza'"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -48,7 +45,6 @@ export default function OnboardingForm() {
       fullName: "",
       gender: "male",
       age: undefined,
-      geminiApiKey: "",
     },
   });
 
@@ -60,10 +56,10 @@ export default function OnboardingForm() {
       // Health check API call
       const response = await fetch(`${API_DOMAIN}/api/Healthcheck`, {
         method: "GET",
-        headers: {
-          accept: "text/plain",
-          Authentication: data.geminiApiKey,
-        },
+        // headers: {
+        //   accept: "text/plain",
+        //   Authentication: data.geminiApiKey,
+        // },
       });
 
       if (!response.ok) {
@@ -163,40 +159,6 @@ export default function OnboardingForm() {
                 <p className="text-sm text-red-300">{errors.age.message}</p>
               )}
             </div>
-
-            {/* API Key Input */}
-            <div className="space-y-1">
-              <Label>Gemini API Key</Label>
-              <Input
-                {...register("geminiApiKey")}
-                autoComplete="off"
-                type="password"
-                placeholder="AIzaSy..."
-                disabled={isLoading}
-              />
-              {errors.geminiApiKey && (
-                <p className="text-sm text-red-300 mb-2">
-                  {errors.geminiApiKey.message}
-                </p>
-              )}
-              <p className="text-xs opacity-80 mt-3">
-                Bạn có thể lấy API Key từ{" "}
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline font-semibold dark:text-blue-400"
-                >
-                  Google AI Studio
-                </a>
-              </p>
-            </div>
-
-            {error && (
-              <div className="animate-fadeIn rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-                <p className="text-sm text-red-300 text-center">{error}</p>
-              </div>
-            )}
 
             <button
               type="submit"

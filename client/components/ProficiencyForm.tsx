@@ -1,36 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { saveUserPreferences } from "@/lib/localStorage"
-import { PROFICIENCY_LEVELS } from "@/lib/constants"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { saveUserPreferences } from "@/lib/localStorage";
+import { PROFICIENCY_LEVELS } from "@/lib/constants";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 type ProficiencyFormProps = {
   formData: {
-    fullName: string
-    gender: string
-    age: number
-    geminiApiKey: string
-  }
-}
+    fullName: string;
+    gender: string;
+    age: number;
+  };
+};
 
 export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
-  const router = useRouter()
-  const [selectedLevel, setSelectedLevel] = useState<number | null>(null)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!selectedLevel) {
-      setError("Vui lòng chọn trình độ của bạn")
-      return
+      setError("Vui lòng chọn trình độ của bạn");
+      return;
     }
 
     try {
@@ -38,18 +37,18 @@ export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
         ...formData,
         proficiencyLevel: selectedLevel,
         hasCompletedOnboarding: true,
-      })
-      router.push("/dashboard")
+      });
+      router.push("/dashboard");
     } catch {
-      setError("Đã có lỗi xảy ra. Vui lòng thử lại.")
+      setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
     }
-  }
+  };
 
   const handleLevelChange = (value: string) => {
-    const level = parseInt(value, 10)
-    setSelectedLevel(level)
-    setError("")
-  }
+    const level = parseInt(value, 10);
+    setSelectedLevel(level);
+    setError("");
+  };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-purple-800 to-blue-600">
@@ -66,7 +65,8 @@ export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
               TRÌNH ĐỘ TIẾNG ANH
             </h1>
             <p className="text-slate-800/80 text-sm dark:text-white/60">
-              Chọn trình độ phù hợp với bạn để EngAce có thể cung cấp nội dung học tập phù hợp nhất.
+              Chọn trình độ phù hợp với bạn để EngAce có thể cung cấp nội dung
+              học tập phù hợp nhất.
             </p>
           </div>
 
@@ -98,7 +98,10 @@ export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
             {selectedLevel && (
               <div className="animate-fadeIn rounded-xl bg-slate/5 p-4 backdrop-blur-sm border border-slate/10 bg-slate-400/10">
                 <p className="text-sm text-slate/90">
-                  {PROFICIENCY_LEVELS.find((l) => l.id === selectedLevel)?.description}
+                  {
+                    PROFICIENCY_LEVELS.find((l) => l.id === selectedLevel)
+                      ?.description
+                  }
                 </p>
               </div>
             )}
@@ -121,5 +124,5 @@ export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
