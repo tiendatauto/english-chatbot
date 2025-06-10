@@ -21,6 +21,7 @@ class Server {
   private setupMiddleware(): void {
     this.app.use(cors())
     this.app.use(express.json()) // req.body
+    this.app.use(express.urlencoded({ extended: true }))
   }
 
   private setupRoutes(): void {

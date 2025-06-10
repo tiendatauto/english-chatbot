@@ -8,7 +8,11 @@ interface MessageItemProps {
 
 export default function MessageItem({ message }: MessageItemProps) {
   return (
-    <div className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex ${
+        message.sender === "user" ? "justify-end" : "justify-start"
+      }`}
+    >
       <div
         className={`flex flex-col space-y-1 ${
           message.sender === "user" ? "items-end" : "items-start"

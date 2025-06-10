@@ -1,8 +1,7 @@
 import express, { Application } from 'express'
 import 'express-async-errors'
 import Server from './server'
-import dotenv from 'dotenv'
-dotenv.config()
+import 'dotenv/config'
 
 class EngChatApplication {
   public run(): void {

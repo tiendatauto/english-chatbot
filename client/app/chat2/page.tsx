@@ -4,19 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getUserPreferences } from "@/lib/localStorage";
 import { API_DOMAIN } from "@/lib/config";
-import { Message, ChatResponse } from "./types";
+import { Message, ChatResponse } from "../chat/types";
 import Navbar from "@/components/Navbar";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import ChatMessages from "./components/ChatMessages";
-import ChatInput from "./components/ChatInput";
-import ChatControls from "./components/ChatControls";
-import FirstVisitGuide from "./components/FirstVisitGuide";
-import Suggestions from "./components/Suggestions";
-
+import ChatMessages from "../chat/components/ChatMessages";
+import ChatInput from "../chat/components/ChatInput";
+import ChatControls from "../chat/components/ChatControls";
+import FirstVisitGuide from "../chat/components/FirstVisitGuide";
+import Suggestions from "../chat/components/Suggestions";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { useSpeechSynthesis } from "react-speech-kit";
 const VISITED_KEY = "has-visited-chat";
 const CHAT_HISTORY_KEY = "chat-history";
 
-export default function ChatPage() {
+export default function ChatPage2() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -31,6 +34,11 @@ export default function ChatPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const preferences = getUserPreferences();
+  const { speak } = useSpeechSynthesis();
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (!preferences.hasCompletedOnboarding) {
@@ -162,7 +170,7 @@ export default function ChatPage() {
   };
 
   const handleSend = async (message = inputMessage) => {
-    if (!message.trim() || isProcessing) return;
+    if (!message.trim() || !transcript || isProcessing) return;
 
     const imageUrls =
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
@@ -179,6 +187,8 @@ export default function ChatPage() {
     setCurrentSuggestions([]);
     setIsProcessing(true);
 
+    resetTranscript();
+    setAudioURL(null);
     try {
       // Format chat history for API
       const chatHistory = messages.map((msg) => ({
@@ -191,13 +201,17 @@ export default function ChatPage() {
           ? await convertImagesToBase64(selectedImages)
           : undefined;
 
+      // const requestData = {
+      //   ChatHistory: [
+      //     ...chatHistory,
+      //     { FromUser: true, Message: message.trim() },
+      //   ],
+      //   Question: message.trim(),
+      //   imagesAsBase64,
+      // };
+
       const requestData = {
-        ChatHistory: [
-          ...chatHistory,
-          { FromUser: true, Message: message.trim() },
-        ],
-        Question: message.trim(),
-        imagesAsBase64,
+        message: message.trim() || transcript,
       };
 
       const headers: HeadersInit = {
@@ -210,19 +224,19 @@ export default function ChatPage() {
       }
 
       // Construct URL with query parameters
-      const url = new URL(`${API_DOMAIN}/api/Chatbot/GenerateAnswer`);
-      url.searchParams.append(
-        "username",
-        preferences.fullName?.trim() || "guest"
-      );
-      url.searchParams.append("gender", preferences.gender || "Unknown");
-      url.searchParams.append("age", (preferences.age || 16).toString());
-      url.searchParams.append(
-        "englishLevel",
-        (preferences.proficiencyLevel || 3).toString()
-      );
-      url.searchParams.append("enableReasoning", enableReasoning.toString());
-      url.searchParams.append("enableSearching", enableSearching.toString());
+      const url = new URL(`${API_DOMAIN}/api/chat`);
+      // url.searchParams.append(
+      //   "username",
+      //   preferences.fullName?.trim() || "guest"
+      // );
+      // url.searchParams.append("gender", preferences.gender || "Unknown");
+      // url.searchParams.append("age", (preferences.age || 16).toString());
+      // url.searchParams.append(
+      //   "englishLevel",
+      //   (preferences.proficiencyLevel || 3).toString()
+      // );
+      // url.searchParams.append("enableReasoning", enableReasoning.toString());
+      // url.searchParams.append("enableSearching", enableSearching.toString());
 
       setSelectedImages([]);
 
@@ -232,7 +246,7 @@ export default function ChatPage() {
       const response = await fetch(url.toString(), {
         method: "POST",
         headers,
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({ message: requestData.message }),
       });
 
       if (!response.ok) {
@@ -242,11 +256,13 @@ export default function ChatPage() {
       const aiResponse: ChatResponse = await response.json();
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse.MessageInMarkdown,
+        content: aiResponse.reply,
         sender: "ai",
         timestamp: new Date(),
         suggestions: aiResponse.Suggestions,
       };
+
+      speak({ text: aiResponse.reply });
 
       setMessages((prev) => [...prev, aiMessage]);
       setCurrentSuggestions(aiResponse.Suggestions || []);
@@ -268,6 +284,42 @@ export default function ChatPage() {
   const handleSuggestionClick = (suggestion: string) => {
     handleSend(suggestion);
   };
+
+  const startRecording = async () => {
+    resetTranscript();
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = new MediaRecorder(stream);
+    audioChunksRef.current = [];
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      audioChunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: "audio/webm",
+      });
+      const url = URL.createObjectURL(audioBlob);
+      setAudioURL(url);
+    };
+
+    mediaRecorderRef.current.start();
+    SpeechRecognition.startListening({ continuous: true });
+    // SpeechRecognition.startListening();
+    // mediaRecorderRef.current?.stop();
+  };
+
+  // Dừng ghi âm
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    SpeechRecognition.stopListening();
+  };
+
+  useEffect(() => {
+    if (!transcript) {
+      setAudioURL(null);
+    }
+  }, [transcript]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-purple-400 to-blue-600">
@@ -295,8 +347,10 @@ export default function ChatPage() {
           )}
 
           <ChatInput
-            inputMessage={inputMessage}
+            inputMessage={inputMessage || transcript}
+            // inputMessage={inputMessage}
             onInputChange={setInputMessage}
+            resetTranscript={resetTranscript}
             onSend={() => handleSend()}
             isProcessing={isProcessing}
             selectedImages={selectedImages}
@@ -318,6 +372,23 @@ export default function ChatPage() {
               if (!enableSearching) setEnableReasoning(false);
             }}
           />
+          {/* <button onClick={() => SpeechRecognition.startListening()}>
+            🎙️ Speak
+          </button> */}
+          <button onClick={startRecording} disabled={listening}>
+            🎙️ Start Speaking
+          </button>
+          <button onClick={stopRecording} disabled={!listening}>
+            🛑 Stop
+          </button>
+          <p>Status: {listening ? "🎤 Listening..." : "🛑 Not Listening"}</p>
+
+          {audioURL && (
+            <div style={{ marginTop: 10 }}>
+              <strong>🔁 Your Voice:</strong>
+              <audio controls src={audioURL}></audio>
+            </div>
+          )}
         </div>
       </div>
 

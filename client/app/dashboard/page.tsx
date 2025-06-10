@@ -50,7 +50,7 @@ const features = [
     description:
       "Tương tác với gia sư AI để được hướng dẫn và hỗ trợ tự học tiếng Anh.",
     icon: MessageCircle,
-    href: "/chat",
+    href: "/chat2",
     gradient: "from-orange-500 to-amber-400",
   },
 ];
@@ -113,16 +113,16 @@ export default function Dashboard() {
     setIsCheckingUpdate(true);
     try {
       const lastShaCode = localStorage.getItem("lastShaCode");
-      const response = await fetch(
-        `${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`
-      );
-      const data: GitHubCommit = await response.json();
+      // const response = await fetch(
+      //   `${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`
+      // );
+      // const data: GitHubCommit = await response.json();
 
-      if (!lastShaCode || lastShaCode !== data.ShaCode) {
-        setUpdateInfo(data);
-        setShowUpdateDialog(true);
-        localStorage.setItem("lastShaCode", data.ShaCode);
-      }
+      // if (!lastShaCode || lastShaCode !== data.ShaCode) {
+      //   setUpdateInfo(data);
+      //   setShowUpdateDialog(true);
+      //   localStorage.setItem("lastShaCode", data.ShaCode);
+      // }
     } catch (error) {
       console.error("Failed to check for updates:", error);
     } finally {

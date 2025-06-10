@@ -19,4 +19,5 @@ export interface ChatRequest {
 export interface ChatResponse {
   MessageInMarkdown: string;
   Suggestions: string[];
+  reply: string;
 }

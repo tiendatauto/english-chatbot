@@ -11,8 +11,8 @@ import MarkdownRenderer from "@/components/MarkdownRenderer";
 const isBrowser = typeof window !== "undefined";
 
 interface DictionaryResponse {
-  Content: string;
-  IpaAudioUrls: string[] | null;
+  content: string;
+  audioUrls: string | null;
 }
 
 function DictionaryResultContent() {
@@ -53,18 +53,18 @@ function DictionaryResultContent() {
         }
 
         // Construct search URL with parameters
-        const searchUrl = new URL(`${API_DOMAIN}/api/Dictionary/Search`);
-        searchUrl.searchParams.append("keyword", keyword);
-        if (context) {
-          searchUrl.searchParams.append("context", context);
-        }
+        const searchUrl = new URL(`${API_DOMAIN}/api/dictionary`);
+        // searchUrl.searchParams.append("keyword", keyword);
+        // if (context) {
+        //   searchUrl.searchParams.append("context", context);
+        // }
 
         const response = await fetch(searchUrl.toString(), {
-          method: "GET",
+          method: "POST",
           headers: {
-            accept: "application/json",
-            Authentication: preferences.geminiApiKey,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ keyword, context }),
         });
 
         if (!response.ok) {
@@ -95,41 +95,49 @@ function DictionaryResultContent() {
       setPlayError(null);
       setIsPlaying(index);
       const audio = new Audio(url);
-      
-      audio.addEventListener('ended', () => {
+
+      audio.addEventListener("ended", () => {
         setIsPlaying(null);
       });
-      
-      audio.addEventListener('error', () => {
+
+      audio.addEventListener("error", () => {
         setIsPlaying(null);
         setPlayError(`Không thể phát âm thanh #${index + 1}`);
       });
-      
+
       await audio.play();
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error("Error playing audio:", error);
       setIsPlaying(null);
       setPlayError(`Không thể phát âm thanh #${index + 1}`);
     }
   };
-  
+
   const renderAudioButtons = () => {
-    if (!result?.IpaAudioUrls?.length) {
+    if (!result?.audioUrls) {
       return null;
     }
-    
+
     return (
       <div className="flex flex-col items-end gap-2">
         <div className="flex items-center gap-2">
-          {result.IpaAudioUrls.map((url, index) => (
+          {[result.audioUrls].map((url, index) => (
             <button
               key={index}
-              onClick={() => playAudio(url, index)}
-              className={`flex items-center space-x-2 rounded-lg bg-white/80 px-4 py-2 text-slate-600 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white ${isPlaying === index ? "bg-gradient-to-r from-purple-500 to-pink-500 !text-white" : ""}`}
+              onClick={() => playAudio(url?.us, index)}
+              className={`flex items-center space-x-2 rounded-lg bg-white/80 px-4 py-2 text-slate-600 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white ${
+                isPlaying === index
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500 !text-white"
+                  : ""
+              }`}
               title={isPlaying === index ? "Đang phát..." : "Phát âm"}
               disabled={isPlaying !== null}
             >
-              <Volume2 className={`h-5 w-5 ${isPlaying === index ? "text-white animate-pulse" : ""}`} />
+              <Volume2
+                className={`h-5 w-5 ${
+                  isPlaying === index ? "text-white animate-pulse" : ""
+                }`}
+              />
             </button>
           ))}
         </div>
@@ -189,7 +197,7 @@ function DictionaryResultContent() {
               </div>
             ) : result ? (
               <div className="animate-fadeIn">
-                <MarkdownRenderer>{result.Content}</MarkdownRenderer>
+                <MarkdownRenderer>{result.content}</MarkdownRenderer>
               </div>
             ) : (
               <div className="text-center text-slate-600 dark:text-slate-400">
@@ -205,21 +213,21 @@ function DictionaryResultContent() {
 
 export default function DictionaryResultPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative h-12 w-12">
-            <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-25"></div>
-            <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
-              <Sparkles className="h-6 w-6 text-white" />
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative h-12 w-12">
+              <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-25"></div>
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
             </div>
+            <p className="text-slate-600 dark:text-slate-400">Loading...</p>
           </div>
-          <p className="text-slate-600 dark:text-slate-400">
-            Loading...
-          </p>
         </div>
-      </div>
-    }>
+      }
+    >
       <DictionaryResultContent />
     </Suspense>
   );

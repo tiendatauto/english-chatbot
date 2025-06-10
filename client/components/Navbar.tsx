@@ -19,6 +19,8 @@ import FeedbackDialog from "./FeedbackDialog";
 import UserProfileDialog from "./UserProfileDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
+const preferences = getUserPreferences();
+
 export default function Navbar() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
@@ -27,7 +29,6 @@ export default function Navbar() {
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
-  const preferences = getUserPreferences();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -45,13 +46,13 @@ export default function Navbar() {
                 onClick={() => router.push("/dashboard")}
                 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400 hover:opacity-80 transition-opacity"
               >
-                EngAce
+                EngChat
               </button>
               <span className="text-sm text-slate-600 dark:text-slate-400">
                 |
               </span>
               <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                {preferences.fullName}
+                {/* {preferences?.fullName} */}
               </span>
             </div>
 
@@ -178,7 +179,7 @@ export default function Navbar() {
                   <div className="flex items-center space-x-2">
                     <Info className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                     <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                      Thông tin về EngAce
+                      Thông tin về EngChat
                     </span>
                   </div>
                 </button>
@@ -218,7 +219,7 @@ export default function Navbar() {
       <FeedbackDialog
         isOpen={showFeedbackDialog}
         onClose={() => setShowFeedbackDialog(false)}
-        userName={preferences.fullName || "Guest"}
+        userName={preferences?.fullName || "Guest"}
       />
     </>
   );

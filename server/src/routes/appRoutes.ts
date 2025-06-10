@@ -1,12 +1,15 @@
 import { Application, Request, Response } from 'express'
 import { HTTP_STATUS } from '~/constants/http'
-// import userRoute from '~/features/user/route/user.route'
+import chatRoute from '~/features/chat/route/chat.route'
+import dictionaryRoute from '~/features/dictionary/route/dictionary.route'
 
 const appRoutes = (app: Application) => {
   // app.use('/api/v1/users', userRoute)
-  app.use('/', (req: Request, res: Response) => {
-    return res.status(HTTP_STATUS.OK).json('connected successfully')
-  })
+  // app.use('/api', (req: Request, res: Response) => {
+  //   return res.status(HTTP_STATUS.OK).json('connected successfully')
+  // })
+  app.use('/api/chat', chatRoute)
+  app.use('/api/dictionary', dictionaryRoute)
 }
 
 export default appRoutes

@@ -10,6 +10,7 @@ interface ChatInputProps {
   selectedImages: File[];
   onImageSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;
+  resetTranscript?: () => void;
 }
 
 export default function ChatInput({
@@ -20,6 +21,7 @@ export default function ChatInput({
   selectedImages,
   onImageSelect,
   onRemoveImage,
+  resetTranscript,
 }: ChatInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +38,12 @@ export default function ChatInput({
         />
         <textarea
           value={inputMessage}
-          onChange={(e) => onInputChange(e.target.value)}
+          onChange={(e) => {
+            onInputChange(e.target.value);
+            if (e.target.value === "" && resetTranscript) {
+              resetTranscript();
+            }
+          }}
           onKeyPress={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
