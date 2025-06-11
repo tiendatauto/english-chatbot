@@ -1,5 +1,6 @@
 "use client";
 
+import "webrtc-adapter";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getUserPreferences } from "@/lib/localStorage";
@@ -16,6 +17,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { useSpeechSynthesis } from "react-speech-kit";
+
 const VISITED_KEY = "has-visited-chat";
 const CHAT_HISTORY_KEY = "chat-history";
 
