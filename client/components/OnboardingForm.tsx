@@ -100,8 +100,8 @@ export default function OnboardingForm() {
               CHÀO MỪNG
             </h1>
             <p className="opacity-70 text-sm">
-              EngAce muốn biết một số thông tin cơ bản để hỗ trợ bạn học tập tốt
-              nhất
+              EngChat muốn biết một số thông tin cơ bản để hỗ trợ bạn học tập
+              tốt nhất
             </p>
           </div>
 

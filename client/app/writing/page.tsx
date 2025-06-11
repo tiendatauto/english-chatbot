@@ -190,7 +190,10 @@ export default function WritingPage() {
                   </div>
                 </div>
               </label>
-              <label className="text-xs italic opacity-70">EngAce vẫn có thể mắc sai sót. Bạn nên tự kiểm chứng lại kết quả nha.</label>
+              <label className="text-xs italic opacity-70">
+                EngChat vẫn có thể mắc sai sót. Bạn nên tự kiểm chứng lại kết
+                quả nha.
+              </label>
             </div>
 
             {/* Submit Button */}
@@ -221,7 +224,7 @@ export default function WritingPage() {
                 Luyện viết thông minh
               </h2>
               <div className="space-y-4 text-slate-600 dark:text-slate-300">
-                <p>Tính năng Luyện viết thông minh của EngAce giúp bạn:</p>
+                <p>Tính năng Luyện viết thông minh của EngChat giúp bạn:</p>
                 <ul className="list-disc ml-6 space-y-2">
                   <li>Nhận phản hồi chi tiết về bài viết của bạn</li>
                   <li>Phát hiện lỗi ngữ pháp và cách diễn đạt</li>

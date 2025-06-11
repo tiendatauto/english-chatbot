@@ -126,7 +126,7 @@ export default function AssignmentResult({
                         {question.ExplanationInVietnamese}
 
                         <p className="italic mt-2">
-                          EngAce đôi khi vẫn mắc sai sót. Bạn nên tự kiểm chứng
+                          EngChat đôi khi vẫn mắc sai sót. Bạn nên tự kiểm chứng
                           lại kết quả nha.
                         </p>
                       </p>

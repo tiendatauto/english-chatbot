@@ -1,10 +1,13 @@
 "use client";
 
+import { FileSpreadsheet } from "lucide-react";
+import { ReactNode, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ReactNode } from "react";
-import { FileSpreadsheet } from "lucide-react";
 
+import { API_DOMAIN } from "@/lib/config";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import * as XLSX from "xlsx";
 
 export interface MarkdownRendererProps {
@@ -33,48 +36,46 @@ const components = {
     after:content-[''] after:absolute after:bottom-0.5 after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:via-pink-500 after:to-blue-500 after:rounded-full after:opacity-75
     hover:scale-100 transition-transform duration-300"
     >
-      {children}
+      {renderChildComponent(children)}
     </h1>
   ),
   h2: ({ children }: ComponentProps) => (
-    <h2 className="text-xl font-bold py-2">{children}</h2>
+    <h2 className="text-xl font-bold py-2">{renderChildComponent(children)}</h2>
   ),
   h3: ({ children }: ComponentProps) => (
-    <h3 className="text-lg font-bold py-2">
-      {children}
-    </h3>
+    <h3 className="text-lg font-bold py-2">{renderChildComponent(children)}</h3>
   ),
   h4: ({ children }: ComponentProps) => (
-    <h4 className="font-bold py-1">{children}</h4>
+    <h4 className="font-bold py-1">{renderChildComponent(children)}</h4>
   ),
   p: ({ children }: ComponentProps) => (
-    <p className="my-2 text-sm md:text-base text-white-600 dark:text-white-400">
-      {children}
+    <p className="my-2 text-sm md:text-base text-white-600 dark:text-white-400 flex flex-wrap">
+      {renderChildComponent(children)}
     </p>
   ),
   ul: ({ children }: ComponentProps) => (
     <ul className="my-2 list-disc pl-4 marker:text-white-500 text-sm md:text-base text-white-600 dark:text-white-400">
-      {children}
+      {renderChildComponent(children)}
     </ul>
   ),
   ol: ({ children }: ComponentProps) => (
     <ol className="my-2 list-decimal pl-4 marker:text-white-500 text-sm md:text-base text-white-600 dark:text-white-400">
-      {children}
+      {renderChildComponent(children)}
     </ol>
   ),
   li: ({ children }: ComponentProps) => (
     <li className="my-2 relative before:absolute before:left-[-1.5em] before:text-white-500 before:font-bold md:text-base text-white-600 dark:text-white-400">
-      {children}
+      {renderChildComponent(children)}
     </li>
   ),
   strong: ({ children }: ComponentProps) => (
     <strong className="font-bold text-white-800 dark:text-white-200">
-      {children}
+      {renderChildComponent(children)}
     </strong>
   ),
   blockquote: ({ children }: ComponentProps) => (
     <blockquote className="my-2 border-l-4 border-blue-500/50 pl-4 not-italic text-sm md:text-base text-white-600 dark:text-white-400">
-      {children}
+      {renderChildComponent(children)}
     </blockquote>
   ),
   a: ({ href, children }: LinkProps) => (
@@ -112,13 +113,17 @@ const components = {
       if (!table) return;
 
       // Get headers
-      const headers = Array.from(table.querySelectorAll("th") as NodeListOf<HTMLTableCellElement>).map(
-        (th) => th.textContent || ""
-      );
+      const headers = Array.from(
+        table.querySelectorAll("th") as NodeListOf<HTMLTableCellElement>
+      ).map((th) => th.textContent || "");
 
       // Get rows
-      const rows = Array.from(table.querySelectorAll("tbody tr") as NodeListOf<HTMLTableRowElement>).map((row) =>
-        Array.from(row.querySelectorAll("td") as NodeListOf<HTMLTableCellElement>).map((td) => td.textContent || "")
+      const rows = Array.from(
+        table.querySelectorAll("tbody tr") as NodeListOf<HTMLTableRowElement>
+      ).map((row) =>
+        Array.from(
+          row.querySelectorAll("td") as NodeListOf<HTMLTableCellElement>
+        ).map((td) => td.textContent || "")
       );
 
       // Create worksheet data
@@ -152,7 +157,7 @@ const components = {
       XLSX.utils.book_append_sheet(wb, ws, "Table Data");
 
       // Generate filename
-      const fileName = `EngAce-${new Date()
+      const fileName = `EngChat-${new Date()
         .toISOString()
         .replace(/[:.]/g, "-")}.xlsx`;
 
@@ -181,7 +186,9 @@ const components = {
     );
   },
   thead: ({ children }: ComponentProps) => (
-    <thead className="bg-slate-400/80 dark:bg-slate-800 text-sm">{children}</thead>
+    <thead className="bg-slate-400/80 dark:bg-slate-800 text-sm">
+      {children}
+    </thead>
   ),
   tbody: ({ children }: ComponentProps) => (
     <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -214,3 +221,54 @@ export default function MarkdownRenderer({ children }: MarkdownRendererProps) {
     </article>
   );
 }
+
+const WordTooltip = ({ word }: { word: string }) => {
+  const [translation, setTranslation] = useState("Đang dịch...");
+  const [loaded, setLoaded] = useState(false);
+
+  const handleShow = async () => {
+    if (loaded) return; // Không dịch lại nếu đã có kết quả
+    try {
+      const url = new URL(`${API_DOMAIN}/api/dictionary/translate`);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: word,
+          targetLang: "vi",
+        }),
+      });
+
+      const data = await res.json();
+      setTranslation(data.translatedText || "Không dịch được");
+    } catch {
+      setTranslation("Lỗi khi dịch");
+    } finally {
+      setLoaded(true);
+    }
+  };
+
+  return (
+    <Tippy
+      onTrigger={handleShow}
+      content={translation}
+      trigger="click"
+      interactive={true}
+    >
+      <span className="cursor-pointer mr-1 underline">{word}</span>
+    </Tippy>
+  );
+};
+
+const renderChildComponent = (children: ReactNode) => {
+  if (typeof children === "string" && children) {
+    return children
+      .split(" ")
+      .map((word, index) => (
+        <WordTooltip key={index} word={word.replace(/[.,!?]/g, "")} />
+      ));
+  }
+  return <></>;
+};

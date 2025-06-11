@@ -1,22 +1,23 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "@/contexts/ThemeContext"
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EngAce - Học tiếng Anh theo cách của bạn",
-  description: "Nền tảng miễn phí sử dụng AI để nâng tầm trải nghiệm học tiếng Anh dành riêng cho người Việt",
+  title: "EngChat - Học tiếng Anh theo cách của bạn",
+  description:
+    "Nền tảng miễn phí sử dụng AI để nâng tầm trải nghiệm học tiếng Anh dành riêng cho người Việt",
   icons: {
     icon: "/favicon.ico",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -31,5 +32,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

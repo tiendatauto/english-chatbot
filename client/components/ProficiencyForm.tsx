@@ -65,7 +65,7 @@ export default function ProficiencyForm({ formData }: ProficiencyFormProps) {
               TRÌNH ĐỘ TIẾNG ANH
             </h1>
             <p className="text-slate-800/80 text-sm dark:text-white/60">
-              Chọn trình độ phù hợp với bạn để EngAce có thể cung cấp nội dung
+              Chọn trình độ phù hợp với bạn để EngChat có thể cung cấp nội dung
               học tập phù hợp nhất.
             </p>
           </div>

@@ -80,7 +80,7 @@ export default function ChatPage2() {
       setMessages([
         {
           id: "welcome",
-          content: `Chào ${preferences.fullName}! Mình là Đạt đẹp troai, trợ lý ảo được thiết kế riêng để hỗ trợ bạn học tiếng Anh nè. 😊\n\nMình luôn cố gắng hỗ trợ bạn tốt nhất, nhưng đôi khi vẫn có thể mắc sai sót, nên bạn nhớ kiểm tra lại những thông tin quan trọng nha!`,
+          content: `Hello ${preferences.fullName}! My name is EngChat, virtual assistant designed specifically to help you learn English. 😊\n\nI always try my best to support you, but sometimes I still make mistakes, so remember to double check important information!`,
           sender: "ai",
           timestamp: new Date(),
         },
@@ -231,23 +231,7 @@ export default function ChatPage2() {
 
       // Construct URL with query parameters
       const url = new URL(`${API_DOMAIN}/api/chat`);
-      // url.searchParams.append(
-      //   "username",
-      //   preferences.fullName?.trim() || "guest"
-      // );
-      // url.searchParams.append("gender", preferences.gender || "Unknown");
-      // url.searchParams.append("age", (preferences.age || 16).toString());
-      // url.searchParams.append(
-      //   "englishLevel",
-      //   (preferences.proficiencyLevel || 3).toString()
-      // );
-      // url.searchParams.append("enableReasoning", enableReasoning.toString());
-      // url.searchParams.append("enableSearching", enableSearching.toString());
-
       setSelectedImages([]);
-
-      // setEnableReasoning(false);
-      // setEnableSearching(false);
 
       const response = await fetch(url.toString(), {
         method: "POST",

@@ -13,7 +13,10 @@ class ChatController {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'Bạn là giáo viên tiếng Anh, giúp người học luyện nói và phản xạ.' },
+          {
+            role: 'system',
+            content: `You are an English teacher helping learners improve their speaking and reflexes in English. Always reply **only in English**, no matter what language the user uses. Stay strictly within the context of English speaking practice and conversation training. Do not translate, explain in other languages, or switch context.`
+          },
           { role: 'user', content: message }
         ]
       })

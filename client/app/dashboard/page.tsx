@@ -4,17 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Book, MessageCircle } from "lucide-react";
 import { getUserPreferences } from "@/lib/localStorage";
-// import { API_DOMAIN } from "@/lib/config";
 import Navbar from "@/components/Navbar";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import InfoDialog from "@/components/InfoDialog";
 import { FEEDBACK_DIALOG_INTERVAL_DAYS } from "@/lib/constants";
-
-// interface GitHubCommit {
-//   ShaCode: string;
-//   Message: string;
-//   Date: string;
-// }
 
 const features = [
   {
@@ -26,24 +19,6 @@ const features = [
     href: "/dictionary",
     gradient: "from-blue-500 to-cyan-400",
   },
-  // {
-  //   title: "BÀI TẬP",
-  //   englishTitle: "Bài tập cá nhân hóa",
-  //   description:
-  //     "Luyện tập với các bài kiểm tra được điều chỉnh theo trình độ và sở thích của bạn.",
-  //   icon: GraduationCap,
-  //   href: "/assignment",
-  //   gradient: "from-purple-500 to-pink-400",
-  // },
-  // {
-  //   title: "LUYỆN VIẾT",
-  //   englishTitle: "Thực hành viết",
-  //   description:
-  //     "Nhận phản hồi và gợi ý ngay lập tức để cải thiện kỹ năng viết tiếng Anh.",
-  //   icon: PenLine,
-  //   href: "/writing",
-  //   gradient: "from-green-500 to-emerald-400",
-  // },
   {
     title: "TƯ VẤN",
     englishTitle: "Trò chuyện với gia sư ảo",
@@ -166,7 +141,7 @@ export default function Dashboard() {
 
 Cập nhật vào lúc **${formatUpdateDate(
                 updateInfo.Date
-              )}**. Thông tin chi tiết tại [**ĐÂY**](https://github.com/phanxuanquang/EngAce/commit/${
+              )}**. Thông tin chi tiết tại [**ĐÂY**](https://github.com/phanxuanquang/EngChat/commit/${
                 updateInfo.ShaCode
               }).
         `.trim()

@@ -1,9 +1,11 @@
-# EngAce Frontend Implementation
+# EngChat Frontend Implementation
 
 ## Overview
-The frontend implementation of EngAce focuses on creating a seamless onboarding experience for new users. Built with Next.js and ShadCN UI components, it features a responsive design and robust form validation.
+
+The frontend implementation of EngChat focuses on creating a seamless onboarding experience for new users. Built with Next.js and ShadCN UI components, it features a responsive design and robust form validation.
 
 ## Key Features
+
 - First-time user onboarding flow
 - Form validation using Zod and React Hook Form
 - Secure storage of user preferences in localStorage
@@ -11,6 +13,7 @@ The frontend implementation of EngAce focuses on creating a seamless onboarding 
 - Dark mode support
 
 ## Project Structure
+
 ```
 engace.next/
 ├── app/
@@ -29,6 +32,7 @@ engace.next/
 ```
 
 ## User Flow
+
 1. First-time users are automatically directed to the onboarding form
 2. Users must complete all required fields:
    - Full name
@@ -40,6 +44,7 @@ engace.next/
 5. Preferences are stored in localStorage for future sessions
 
 ## Technical Details
+
 - Form validation using Zod schema
 - Client-side routing with Next.js
 - Component-based architecture
@@ -47,7 +52,9 @@ engace.next/
 - Responsive design using Tailwind CSS
 
 ## Development
+
 To start the development server:
+
 ```bash
 npm run dev
 ```
@@ -55,11 +62,13 @@ npm run dev
 The application will be available at `http://localhost:3000`.
 
 ## Security Considerations
+
 - API keys are stored locally and not transmitted to any external servers
 - Form validation ensures data integrity
 - Client-side storage using localStorage for user preferences
 
 ## Next Steps
+
 1. Implement additional dashboard features
 2. Add error boundary components
 3. Enhance form accessibility

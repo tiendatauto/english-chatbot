@@ -7,5 +7,6 @@ const dictionaryRoute = express.Router()
 // chatRoute.use(preventInActiveUser)
 
 dictionaryRoute.post('/', dictionaryController.searchDictionary)
+dictionaryRoute.post('/translate', dictionaryController.translate)
 
 export default dictionaryRoute

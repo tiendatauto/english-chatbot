@@ -170,6 +170,17 @@ Hãy giải thích nghĩa của từ "${keyword}"${context ? ` trong ngữ cản
 </OUTPUT_EXAMPLE>
 `
 
+const promptTranslation = ({ text }: { text: string }) => `
+Bạn là một công cụ phiên dịch, luôn dịch từ tiếng anh sang tiếng việt.  
+Hãy dịch từ "${text}" 1 cách ngắn gọn chỉ cần ghi ra (loại từ):nghĩa của nó, nếu có nhiều nghĩa thì cứ liệt kê sau dấu phẩy
+Trình bày theo phong cách trang trọng, ngắn gọn,giống từ điển.  
+
+hãy loại bỏ các dấu * trong câu trả lời
+🔹 *Ví dụ:*  
+Lịch trình, sắp xếp
+
+`
+
 class DictionaryController {
   public async getIPAAndAudio(word: string) {
     try {
@@ -220,6 +231,39 @@ class DictionaryController {
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Gemini error' })
+    }
+  }
+
+  public async translate(req: Request, res: Response) {
+    const { text } = req.body
+
+    try {
+      // const response = await fetch('https://libretranslate.de/translate', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     q: text,
+      //     source: 'auto',
+      //     target: 'vi',
+      //     format: 'text'
+      //   })
+      // })
+
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+      const result = await model.generateContent(promptTranslation({ text }))
+      const content = result.response.text()
+
+      const response = {
+        translatedText: content
+      }
+
+      res.json(response)
+
+      // const data = await response.json()
+      // res.json({ translatedText: data.translatedText })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Lỗi khi dịch văn bản' })
     }
   }
 }

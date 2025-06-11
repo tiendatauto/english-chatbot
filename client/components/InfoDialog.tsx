@@ -12,28 +12,22 @@ interface InfoDialogProps {
   showGithubButton?: boolean;
 }
 
-export default function InfoDialog({ 
-  isOpen, 
-  onClose, 
-  title = "Giới thiệu về EngAce", 
-  content, 
+export default function InfoDialog({
+  isOpen,
+  onClose,
+  title = "Giới thiệu về EngChat",
+  content,
   loading = false,
-  showGithubButton = true 
+  showGithubButton = true,
 }: InfoDialogProps) {
   if (!isOpen) return null;
 
   const defaultContent = `
-**EngAce** là nền tảng hỗ trợ học tiếng Anh **miễn phí** tích hợp AI nhằm giúp việc tự học trở nên tự nhiên và hiệu quả hơn. EngAce cá nhân hóa trải nghiệm học tập với các tính năng **độc quyền**:
+**EngChat** là nền tảng hỗ trợ học tiếng Anh **miễn phí** tích hợp AI nhằm giúp việc tự học trở nên tự nhiên và hiệu quả hơn. EngChat cá nhân hóa trải nghiệm học tập với các tính năng **độc quyền**:
 
 - **Từ điển thông minh**: Cung cấp nghĩa, ví dụ minh họa, thành ngữ, cụm động từ và *tìm kiếm theo ngữ cảnh*, giúp hiểu sâu cách dùng từ.
-- **Bài tập cá nhân hóa**: Hệ thống bộ đề được tùy biến theo trình độ lên đến 100 câu hỏi và hàng chục dạng bài tập đa dạng.
-- **Luyện viết**: AI đánh giá chi tiết về ngữ pháp, phong cách và mạch lạc, đồng thời gợi ý cải thiện bài viết.
 - **Gia sư ảo**: Hỗ trợ tự học tiếng Anh qua các cuộc hội thoại tương tác, tương tự như một giáo viên.
 
-EngAce được tạo ra bởi nhóm tác giả:
-
-- [Phan Xuân Quang](https://github.com/phanxuanquang)  
-- [Bùi Minh Tuấn](https://github.com/tuan20520342) 
 `.trim();
 
   return (
@@ -56,12 +50,12 @@ EngAce được tạo ra bởi nhóm tác giả:
           ) : (
             <MarkdownRenderer>{content || defaultContent}</MarkdownRenderer>
           )}
-          
+
           {showGithubButton && (
             <div className="flex justify-center mt-8">
               <button>
                 <a
-                  href="https://github.com/phanxuanquang/EngAce"
+                  href="https://github.com/phanxuanquang/EngChat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200"
