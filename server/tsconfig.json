@@ -11,7 +11,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["src/*"] // Alias import
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]

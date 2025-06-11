@@ -37,10 +37,11 @@ class Server {
     this.app.use((error: IError, req: Request, res: Response, next: NextFunction) => {
       console.log('check error: ', error)
       if (error instanceof CustomError) {
-        return res.status(error.statusCode).json(error.getErrorResponse())
+        res.status(error.statusCode).json(error.getErrorResponse())
+        return
       }
 
-      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error })
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error })
     })
   }
 

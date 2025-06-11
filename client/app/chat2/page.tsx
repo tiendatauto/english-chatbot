@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import ChatMessages from "../chat/components/ChatMessages";
 import ChatInput from "../chat/components/ChatInput";
-// import ChatControls from "../chat/components/ChatControls";
 import FirstVisitGuide from "../chat/components/FirstVisitGuide";
 import Suggestions from "../chat/components/Suggestions";
 import SpeechRecognition, {
@@ -31,8 +30,6 @@ export default function ChatPage2() {
   const [hasRestoredMessages, setHasRestoredMessages] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [initMessage, setInitMessage] = useState(true);
-  // const [enableReasoning, setEnableReasoning] = useState(false);
-  // const [enableSearching, setEnableSearching] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -157,24 +154,6 @@ export default function ChatPage2() {
     setSelectedImages((prev) => [...prev, ...newFiles]);
   };
 
-  // const convertImagesToBase64 = async (images: File[]): Promise<string[]> => {
-  //   const base64Promises = images.map((image) => {
-  //     return new Promise<string>((resolve, reject) => {
-  //       const reader = new FileReader();
-  //       reader.onload = () => {
-  //         if (typeof reader.result === "string") {
-  //           resolve(reader.result);
-  //         } else {
-  //           reject(new Error("Failed to convert image to base64"));
-  //         }
-  //       };
-  //       reader.onerror = reject;
-  //       reader.readAsDataURL(image);
-  //     });
-  //   });
-  //   return Promise.all(base64Promises);
-  // };
-
   const handleSend = async (message = inputMessage) => {
     if ((!message.trim() && !transcript) || isProcessing) {
       return;
@@ -198,26 +177,6 @@ export default function ChatPage2() {
     resetTranscript();
     setAudioURL(null);
     try {
-      // Format chat history for API
-      // const chatHistory = messages.map((msg) => ({
-      //   FromUser: msg.sender === "user",
-      //   Message: msg.content,
-      // }));
-
-      // const imagesAsBase64 =
-      //   selectedImages.length > 0
-      //     ? await convertImagesToBase64(selectedImages)
-      //     : undefined;
-
-      // const requestData = {
-      //   ChatHistory: [
-      //     ...chatHistory,
-      //     { FromUser: true, Message: message.trim() },
-      //   ],
-      //   Question: message.trim(),
-      //   imagesAsBase64,
-      // };
-
       const requestData = {
         message: message.trim() || transcript,
       };
@@ -345,7 +304,6 @@ export default function ChatPage2() {
 
           <ChatInput
             inputMessage={inputMessage || transcript}
-            // inputMessage={inputMessage}
             onInputChange={setInputMessage}
             resetTranscript={resetTranscript}
             onSend={() => handleSend()}
@@ -356,22 +314,7 @@ export default function ChatPage2() {
               setSelectedImages((prev) => prev.filter((_, i) => i !== index))
             }
           />
-          {/* <ChatControls
-            onImageClick={() => fileInputRef.current?.click()}
-            enableReasoning={enableReasoning}
-            onReasoningToggle={() => {
-              setEnableReasoning(!enableReasoning);
-              if (!enableReasoning) setEnableSearching(false);
-            }}
-            enableSearching={enableSearching}
-            onSearchingToggle={() => {
-              setEnableSearching(!enableSearching);
-              if (!enableSearching) setEnableReasoning(false);
-            }}
-          /> */}
-          {/* <button onClick={() => SpeechRecognition.startListening()}>
-            🎙️ Speak
-          </button> */}
+
           <div className="flex justify-between items-center gap-x-4">
             <button
               onClick={startRecording}

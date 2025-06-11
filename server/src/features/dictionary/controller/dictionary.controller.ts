@@ -172,12 +172,10 @@ Hãy giải thích nghĩa của từ "${keyword}"${context ? ` trong ngữ cản
 
 const promptTranslation = ({ text }: { text: string }) => `
 Bạn là một công cụ phiên dịch, luôn dịch từ tiếng anh sang tiếng việt.  
-Hãy dịch từ "${text}" 1 cách ngắn gọn chỉ cần ghi ra (loại từ):nghĩa của nó, nếu có nhiều nghĩa thì cứ liệt kê sau dấu phẩy
+Hãy dịch từ "${text}" 1 cách ngắn gọn chỉ cần ghi ra (phiên âm IPA) (loại từ):nghĩa của nó, nếu có nhiều nghĩa thì cứ liệt kê sau dấu phẩy
 Trình bày theo phong cách trang trọng, ngắn gọn,giống từ điển.  
 
 hãy loại bỏ các dấu * trong câu trả lời
-🔹 *Ví dụ:*  
-Lịch trình, sắp xếp
 
 `
 
@@ -211,7 +209,7 @@ class DictionaryController {
     const { keyword, context } = req.body
 
     if (!keyword) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: 'Missing keyword' })
+      res.status(HTTP_STATUS.BAD_REQUEST).json({ error: 'Missing keyword' })
     }
     try {
       const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })

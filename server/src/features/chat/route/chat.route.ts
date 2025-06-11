@@ -1,8 +1,6 @@
 import express from 'express'
 import { chatController } from '../controller/chat.controller'
-// import { userController } from '../controller/user.controller'
-// import { validateSchema } from '~/globals/middlewares/validate.middleware'
-// import { userSchemaCreate, userSchemaUpdate } from '../schema/user.schema'
+import { upload } from '~/middlewares/upload.middleware'
 
 const chatRoute = express.Router()
 
@@ -11,5 +9,5 @@ const chatRoute = express.Router()
 // chatRoute.use(preventInActiveUser)
 
 chatRoute.post('/', chatController.chat)
-
+chatRoute.post('/whisper', upload.single('file'), chatController.whisper)
 export default chatRoute
