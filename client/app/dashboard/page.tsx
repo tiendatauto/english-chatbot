@@ -25,7 +25,7 @@ const features = [
     description:
       "Tương tác với gia sư AI để được hướng dẫn và hỗ trợ tự học tiếng Anh.",
     icon: MessageCircle,
-    href: "/chat2",
+    href: "/chat",
     gradient: "from-orange-500 to-amber-400",
   },
 ];

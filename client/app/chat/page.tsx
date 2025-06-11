@@ -1,17 +1,21 @@
 "use client";
 
+import "webrtc-adapter";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getUserPreferences } from "@/lib/localStorage";
 import { API_DOMAIN } from "@/lib/config";
-import { Message, ChatResponse } from "./types";
+import { Message, ChatResponse } from "../chat/types";
 import Navbar from "@/components/Navbar";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import ChatMessages from "./components/ChatMessages";
 import ChatInput from "./components/ChatInput";
-import ChatControls from "./components/ChatControls";
 import FirstVisitGuide from "./components/FirstVisitGuide";
 import Suggestions from "./components/Suggestions";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { useSpeechSynthesis } from "react-speech-kit";
+import ChatMessages from "./components/ChatMessages";
 
 const VISITED_KEY = "has-visited-chat";
 const CHAT_HISTORY_KEY = "chat-history";
@@ -25,12 +29,16 @@ export default function ChatPage() {
   const [isClearing, setIsClearing] = useState(false);
   const [hasRestoredMessages, setHasRestoredMessages] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [enableReasoning, setEnableReasoning] = useState(false);
-  const [enableSearching, setEnableSearching] = useState(false);
+  const [initMessage, setInitMessage] = useState(true);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const preferences = getUserPreferences();
+  const { speak, cancel } = useSpeechSynthesis();
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (!preferences.hasCompletedOnboarding) {
@@ -67,22 +75,24 @@ export default function ChatPage() {
       } catch (error) {
         console.error("Error loading chat history:", error);
       }
-    } else if (!hasRestoredMessages) {
+    } else if (!hasRestoredMessages || initMessage) {
       setMessages([
         {
           id: "welcome",
-          content: `Chào ${preferences.fullName}! Mình là EngChat, trợ lý ảo được thiết kế riêng để hỗ trợ bạn học tiếng Anh nè. 😊\n\nMình luôn cố gắng hỗ trợ bạn tốt nhất, nhưng đôi khi vẫn có thể mắc sai sót, nên bạn nhớ kiểm tra lại những thông tin quan trọng nha!`,
+          content: `Hello ${preferences.fullName}! My name is EngChat, virtual assistant designed specifically to help you learn English. 😊\n\nI always try my best to support you, but sometimes I still make mistakes, so remember to double check important information!`,
           sender: "ai",
           timestamp: new Date(),
         },
       ]);
     }
     setHasRestoredMessages(true);
+    setInitMessage(false);
   }, [
     router,
     preferences.hasCompletedOnboarding,
     hasRestoredMessages,
     preferences.fullName,
+    initMessage,
   ]);
 
   // Save messages to localStorage whenever they change
@@ -102,6 +112,7 @@ export default function ChatPage() {
   const handleClearChat = () => {
     setMessages([]);
     setCurrentSuggestions([]);
+    setInitMessage(true);
   };
 
   const getImageUrls = (images: File[]): string[] => {
@@ -143,32 +154,16 @@ export default function ChatPage() {
     setSelectedImages((prev) => [...prev, ...newFiles]);
   };
 
-  const convertImagesToBase64 = async (images: File[]): Promise<string[]> => {
-    const base64Promises = images.map((image) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to convert image to base64"));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(image);
-      });
-    });
-    return Promise.all(base64Promises);
-  };
-
   const handleSend = async (message = inputMessage) => {
-    if (!message.trim() || isProcessing) return;
+    if ((!message.trim() && !transcript) || isProcessing) {
+      return;
+    }
 
     const imageUrls =
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: message,
+      content: message || transcript,
       sender: "user",
       timestamp: new Date(),
       images: imageUrls,
@@ -179,25 +174,11 @@ export default function ChatPage() {
     setCurrentSuggestions([]);
     setIsProcessing(true);
 
+    resetTranscript();
+    setAudioURL(null);
     try {
-      // Format chat history for API
-      const chatHistory = messages.map((msg) => ({
-        FromUser: msg.sender === "user",
-        Message: msg.content,
-      }));
-
-      const imagesAsBase64 =
-        selectedImages.length > 0
-          ? await convertImagesToBase64(selectedImages)
-          : undefined;
-
       const requestData = {
-        ChatHistory: [
-          ...chatHistory,
-          { FromUser: true, Message: message.trim() },
-        ],
-        Question: message.trim(),
-        imagesAsBase64,
+        message: message.trim() || transcript,
       };
 
       const headers: HeadersInit = {
@@ -210,29 +191,13 @@ export default function ChatPage() {
       }
 
       // Construct URL with query parameters
-      const url = new URL(`${API_DOMAIN}/api/Chatbot/GenerateAnswer`);
-      url.searchParams.append(
-        "username",
-        preferences.fullName?.trim() || "guest"
-      );
-      url.searchParams.append("gender", preferences.gender || "Unknown");
-      url.searchParams.append("age", (preferences.age || 16).toString());
-      url.searchParams.append(
-        "englishLevel",
-        (preferences.proficiencyLevel || 3).toString()
-      );
-      url.searchParams.append("enableReasoning", enableReasoning.toString());
-      url.searchParams.append("enableSearching", enableSearching.toString());
-
+      const url = new URL(`${API_DOMAIN}/api/chat`);
       setSelectedImages([]);
-
-      setEnableReasoning(false);
-      setEnableSearching(false);
 
       const response = await fetch(url.toString(), {
         method: "POST",
         headers,
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({ message: requestData.message }),
       });
 
       if (!response.ok) {
@@ -242,11 +207,13 @@ export default function ChatPage() {
       const aiResponse: ChatResponse = await response.json();
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse.MessageInMarkdown,
+        content: aiResponse.reply,
         sender: "ai",
         timestamp: new Date(),
         suggestions: aiResponse.Suggestions,
       };
+
+      speak({ text: aiResponse.reply });
 
       setMessages((prev) => [...prev, aiMessage]);
       setCurrentSuggestions(aiResponse.Suggestions || []);
@@ -268,6 +235,47 @@ export default function ChatPage() {
   const handleSuggestionClick = (suggestion: string) => {
     handleSend(suggestion);
   };
+
+  const startRecording = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert(
+        "Trình duyệt không hỗ trợ ghi âm (getUserMedia). Vui lòng dùng Chrome trên Android hoặc Safari mới nhất."
+      );
+      return;
+    }
+    cancel();
+    resetTranscript();
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = stream && new MediaRecorder(stream);
+    audioChunksRef.current = [];
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      audioChunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: "audio/webm",
+      });
+      const url = URL.createObjectURL(audioBlob);
+      setAudioURL(url);
+    };
+
+    mediaRecorderRef.current.start();
+    SpeechRecognition.startListening({ continuous: true });
+  };
+
+  // Dừng ghi âm
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    SpeechRecognition.stopListening();
+  };
+
+  useEffect(() => {
+    if (!transcript) {
+      setAudioURL(null);
+    }
+  }, [transcript]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-purple-400 to-blue-600">
@@ -295,8 +303,9 @@ export default function ChatPage() {
           )}
 
           <ChatInput
-            inputMessage={inputMessage}
+            inputMessage={inputMessage || transcript}
             onInputChange={setInputMessage}
+            resetTranscript={resetTranscript}
             onSend={() => handleSend()}
             isProcessing={isProcessing}
             selectedImages={selectedImages}
@@ -305,19 +314,32 @@ export default function ChatPage() {
               setSelectedImages((prev) => prev.filter((_, i) => i !== index))
             }
           />
-          <ChatControls
-            onImageClick={() => fileInputRef.current?.click()}
-            enableReasoning={enableReasoning}
-            onReasoningToggle={() => {
-              setEnableReasoning(!enableReasoning);
-              if (!enableReasoning) setEnableSearching(false);
-            }}
-            enableSearching={enableSearching}
-            onSearchingToggle={() => {
-              setEnableSearching(!enableSearching);
-              if (!enableSearching) setEnableReasoning(false);
-            }}
-          />
+
+          <div className="flex justify-between items-center gap-x-4">
+            <button
+              onClick={startRecording}
+              disabled={listening}
+              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+            >
+              🎙️ Start Speaking
+            </button>
+            <button
+              onClick={stopRecording}
+              disabled={!listening}
+              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+            >
+              🛑 Stop
+            </button>
+          </div>
+
+          <p>Status: {listening ? "🎤 Listening..." : "🛑 Not Listening"}</p>
+
+          {audioURL && (
+            <div style={{ marginTop: 10 }}>
+              <strong>🔁 Your Voice:</strong>
+              <audio controls src={audioURL}></audio>
+            </div>
+          )}
         </div>
       </div>
 
