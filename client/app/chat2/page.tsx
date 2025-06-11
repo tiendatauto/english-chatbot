@@ -38,8 +38,7 @@ export default function ChatPage2() {
   const router = useRouter();
   const preferences = getUserPreferences();
   const { speak, cancel } = useSpeechSynthesis();
-  const { listening, resetTranscript, interimTranscript } =
-    useSpeechRecognition();
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -177,7 +176,7 @@ export default function ChatPage2() {
   // };
 
   const handleSend = async (message = inputMessage) => {
-    if ((!message.trim() && !interimTranscript) || isProcessing) {
+    if ((!message.trim() && !transcript) || isProcessing) {
       return;
     }
 
@@ -185,7 +184,7 @@ export default function ChatPage2() {
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: message || interimTranscript,
+      content: message || transcript,
       sender: "user",
       timestamp: new Date(),
       images: imageUrls,
@@ -220,7 +219,7 @@ export default function ChatPage2() {
       // };
 
       const requestData = {
-        message: message.trim() || interimTranscript,
+        message: message.trim() || transcript,
       };
 
       const headers: HeadersInit = {
@@ -314,10 +313,10 @@ export default function ChatPage2() {
   };
 
   useEffect(() => {
-    if (!interimTranscript) {
+    if (!transcript) {
       setAudioURL(null);
     }
-  }, [interimTranscript]);
+  }, [transcript]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-purple-400 to-blue-600">
@@ -345,7 +344,7 @@ export default function ChatPage2() {
           )}
 
           <ChatInput
-            inputMessage={interimTranscript || inputMessage}
+            inputMessage={inputMessage || transcript}
             // inputMessage={inputMessage}
             onInputChange={setInputMessage}
             resetTranscript={resetTranscript}
