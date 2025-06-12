@@ -1,32 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Moon,
-  Sun,
-  LogOut,
-  Menu,
-  X,
-  UserCircle,
-  MessageCircleHeart,
-  Info,
-} from "lucide-react";
-import { getUserPreferences } from "@/lib/localStorage";
-import { useTheme } from "@/contexts/ThemeContext";
-import InfoDialog from "./InfoDialog";
-import FeedbackDialog from "./FeedbackDialog";
-import UserProfileDialog from "./UserProfileDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
-
-const preferences = getUserPreferences();
+import { useTheme } from "@/contexts/ThemeContext";
+import { Info, LogOut, Menu, Moon, Sun, UserCircle, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import InfoDialog from "./InfoDialog";
+import UserProfileDialog from "./UserProfileDialog";
 
 export default function Navbar() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
 
@@ -102,14 +88,6 @@ export default function Navbar() {
               </button>
 
               <button
-                onClick={() => setShowFeedbackDialog(true)}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label="Submit feedback"
-              >
-                <MessageCircleHeart className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-              </button>
-
-              <button
                 onClick={() => setShowInfoDialog(true)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Project information"
@@ -159,19 +137,6 @@ export default function Navbar() {
                 </button>
 
                 <button
-                  onClick={() => setShowFeedbackDialog(true)}
-                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                  aria-label="Submit feedback"
-                >
-                  <div className="flex items-center space-x-2">
-                    <MessageCircleHeart className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                      Phản hồi từ người dùng
-                    </span>
-                  </div>
-                </button>
-
-                <button
                   onClick={() => setShowInfoDialog(true)}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   aria-label="Project information"
@@ -215,11 +180,6 @@ export default function Navbar() {
       <InfoDialog
         isOpen={showInfoDialog}
         onClose={() => setShowInfoDialog(false)}
-      />
-      <FeedbackDialog
-        isOpen={showFeedbackDialog}
-        onClose={() => setShowFeedbackDialog(false)}
-        userName={preferences?.fullName || "Guest"}
       />
     </>
   );

@@ -1,9 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserRound, Key, X, Loader2, AlertCircle } from "lucide-react";
-import { PROFICIENCY_LEVELS } from "@/lib/constants";
 import {
   Select,
   SelectContent,
@@ -11,8 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getUserPreferences, saveUserPreferences } from "@/lib/localStorage";
 import { API_DOMAIN } from "@/lib/config";
+import { PROFICIENCY_LEVELS } from "@/lib/constants";
+import { getUserPreferences, saveUserPreferences } from "@/lib/localStorage";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, Loader2, UserRound, X } from "lucide-react";
+import { useState } from "react";
 
 interface UserProfileDialogProps {
   isOpen: boolean;
@@ -33,11 +33,10 @@ export default function UserProfileDialog({
 }: UserProfileDialogProps) {
   const preferences = getUserPreferences();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [selectedLevelDescription, setSelectedLevelDescription] = useState<
-    string
-  >("");
+  const [selectedLevelDescription, setSelectedLevelDescription] =
+    useState<string>("");
   const [formData, setFormData] = useState({
     fullName: preferences.fullName || "",
     age: preferences.age?.toString() || "",
@@ -74,11 +73,6 @@ export default function UserProfileDialog({
       isValid = false;
     }
 
-    if (!formData.geminiApiKey.trim()) {
-      errors.geminiApiKey = "Vui lòng nhập API Key";
-      isValid = false;
-    }
-
     if (!formData.proficiencyLevel) {
       errors.proficiencyLevel = "Vui lòng chọn trình độ";
       isValid = false;
@@ -92,7 +86,7 @@ export default function UserProfileDialog({
     if (!validateForm()) return;
 
     setLoading(true);
-    setError(null);
+    // setError(null);
 
     try {
       const response = await fetch(`${API_DOMAIN}/api/Healthcheck`, {
@@ -121,7 +115,8 @@ export default function UserProfileDialog({
 
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      console.log(err);
+      // setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -300,38 +295,6 @@ export default function UserProfileDialog({
                 {selectedLevelDescription && (
                   <div className="mt-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                     {selectedLevelDescription}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="geminiApiKey"
-                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
-                >
-                  Gemini API Key
-                </label>
-                <div className="relative">
-                  <input
-                    id="geminiApiKey"
-                    type="password"
-                    placeholder="Nhập API Key"
-                    value={formData.geminiApiKey}
-                    onChange={(e) =>
-                      setFormData({ ...formData, geminiApiKey: e.target.value })
-                    }
-                    className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                      formErrors.geminiApiKey || error
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-slate-200 dark:border-slate-700 focus:ring-blue-500"
-                    } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 transition-all text-sm sm:text-base`}
-                  />
-                  <Key className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
-                </div>
-                {(formErrors.geminiApiKey || error) && (
-                  <div className="flex items-center mt-1 text-xs sm:text-sm text-red-500">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {formErrors.geminiApiKey || error}
                   </div>
                 )}
               </div>

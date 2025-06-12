@@ -1,118 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Book, MessageCircle } from "lucide-react";
-import { getUserPreferences } from "@/lib/localStorage";
-import Navbar from "@/components/Navbar";
-import FeedbackDialog from "@/components/FeedbackDialog";
 import InfoDialog from "@/components/InfoDialog";
-import { FEEDBACK_DIALOG_INTERVAL_DAYS } from "@/lib/constants";
-
-const features = [
-  {
-    title: "TỪ ĐIỂN",
-    englishTitle: "Tra cứu thông minh",
-    description:
-      "Truy cập định nghĩa từ, thành ngữ và cụm động từ với ngữ cảnh của từ.",
-    icon: Book,
-    href: "/dictionary",
-    gradient: "from-blue-500 to-cyan-400",
-  },
-  {
-    title: "TƯ VẤN",
-    englishTitle: "Trò chuyện với gia sư ảo",
-    description:
-      "Tương tác với gia sư AI để được hướng dẫn và hỗ trợ tự học tiếng Anh.",
-    icon: MessageCircle,
-    href: "/chat",
-    gradient: "from-orange-500 to-amber-400",
-  },
-];
+import Navbar from "@/components/Navbar";
+import { useCheckOnboard } from "@/hooks/useCheckOnboard";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { features } from "./constant";
 
 export default function Dashboard() {
   const router = useRouter();
-  const preferences = getUserPreferences();
-  const [showInfoDialog, setShowInfoDialog] = useState(false);
-  // const [showUpdateDialog, setShowUpdateDialog] = useState(false);
-  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
-  // const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
-  // const [updateInfo, setUpdateInfo] = useState<GitHubCommit | null>(null);
-
-  useEffect(() => {
-    // if (!preferences.hasCompletedOnboarding) {
-    //   router.push("/");
-    //   return;
-    // }
-
-    // Show info dialog if user hasn't seen it before
-    const hasSeenInfo = localStorage.getItem("hasSeenInfo");
-    if (!hasSeenInfo) {
-      setShowInfoDialog(true);
-      localStorage.setItem("hasSeenInfo", "true");
-    }
-
-    // Check for updates if not first entry
-    const firstEntryDate = localStorage.getItem("firstEntryDate");
-    if (firstEntryDate) {
-      checkForUpdates();
-    }
-  }, [router, preferences.hasCompletedOnboarding]);
-
-  useEffect(() => {
-    // Check if user has completed onboarding
-    if (!preferences.hasCompletedOnboarding) return;
-
-    // Get the first entry date from localStorage or set it if not exists
-    const firstEntryDate = localStorage.getItem("firstEntryDate");
-    if (!firstEntryDate) {
-      localStorage.setItem("firstEntryDate", new Date().toISOString());
-      return;
-    }
-
-    // Calculate days since first entry
-    const daysSinceFirstEntry = Math.floor(
-      (Date.now() - new Date(firstEntryDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    // Show feedback dialog if days is divisible by FEEDBACK_DIALOG_INTERVAL_DAYS
-    if (
-      daysSinceFirstEntry > 0 &&
-      daysSinceFirstEntry % FEEDBACK_DIALOG_INTERVAL_DAYS === 0
-    ) {
-      setShowFeedbackDialog(true);
-    }
-  }, [preferences.hasCompletedOnboarding]);
-
-  const checkForUpdates = async () => {
-    // setIsCheckingUpdate(true);
-    try {
-      // const lastShaCode = localStorage.getItem("lastShaCode");
-      // const response = await fetch(
-      //   `${API_DOMAIN}/api/Healthcheck/GetLatestGithubCommit`
-      // );
-      // const data: GitHubCommit = await response.json();
-      // if (!lastShaCode || lastShaCode !== data.ShaCode) {
-      //   setUpdateInfo(data);
-      //   setShowUpdateDialog(true);
-      //   localStorage.setItem("lastShaCode", data.ShaCode);
-      // }
-    } catch (error) {
-      console.error("Failed to check for updates:", error);
-    } finally {
-      // setIsCheckingUpdate(false);
-    }
-  };
-
-  // const formatUpdateDate = (dateString: string) => {
-  //   return new Date(dateString).toLocaleString("vi-VN", {
-  //     day: "numeric",
-  //     month: "numeric",
-  //     year: "numeric",
-  //     hour: "numeric",
-  //     minute: "numeric",
-  //   });
-  // };
+  const [showInfoDialog, setShowInfoDialog] = useState(true);
+  useCheckOnboard();
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50/95 via-purple-50/98 to-slate-100/95 dark:from-slate-950/95 dark:via-purple-900/40 dark:to-slate-950/95 transition-all duration-1000">
@@ -125,36 +23,6 @@ export default function Dashboard() {
       <InfoDialog
         isOpen={showInfoDialog}
         onClose={() => setShowInfoDialog(false)}
-      />
-
-      {/* Update Dialog */}
-      {/* <InfoDialog
-        isOpen={showUpdateDialog}
-        onClose={() => setShowUpdateDialog(false)}
-        title="Cập nhật mới"
-        loading={isCheckingUpdate}
-        content={
-          updateInfo
-            ? `${updateInfo.Message}
-
----
-
-Cập nhật vào lúc **${formatUpdateDate(
-                updateInfo.Date
-              )}**. Thông tin chi tiết tại [**ĐÂY**](https://github.com/phanxuanquang/EngChat/commit/${
-                updateInfo.ShaCode
-              }).
-        `.trim()
-            : ""
-        }
-        showGithubButton={true}
-      /> */}
-
-      {/* Feedback Dialog */}
-      <FeedbackDialog
-        isOpen={showFeedbackDialog}
-        onClose={() => setShowFeedbackDialog(false)}
-        userName={preferences.fullName || ""}
       />
 
       {/* Main content with padding-top to account for fixed navbar */}

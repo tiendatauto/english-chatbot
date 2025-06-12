@@ -57,7 +57,9 @@ export default function MessageItem({ message }: MessageItemProps) {
                 : ""
             }`}
           >
-            <MarkdownRenderer>{message.content}</MarkdownRenderer>
+            <MarkdownRenderer noSplit={false}>
+              {message.content}
+            </MarkdownRenderer>
           </div>
 
           {message.images && message.images.length > 0 && (

@@ -53,16 +53,10 @@ export default function InfoDialog({
 
           {showGithubButton && (
             <div className="flex justify-center mt-8">
-              <button>
-                <a
-                  href="https://github.com/phanxuanquang/EngChat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200"
-                >
-                  <Github className="font-semibold" />
-                  <span className="font-semibold">Dự án trên GitHub</span>
-                </a>
+              <button onClick={onClose}>
+                <span className="font-semibold inline-flex items-center space-x-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200">
+                  VÀO HỌC NGAY
+                </span>
               </button>
             </div>
           )}

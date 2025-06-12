@@ -37,6 +37,8 @@ export const PROFICIENCY_LEVELS = [
   },
 ] as const;
 
-export type ProficiencyLevel = typeof PROFICIENCY_LEVELS[number];
+export type ProficiencyLevel = (typeof PROFICIENCY_LEVELS)[number];
 
 export const FEEDBACK_DIALOG_INTERVAL_DAYS = 4;
+export const VISITED_KEY = "has-visited-chat";
+export const CHAT_HISTORY_KEY = "chat-history";

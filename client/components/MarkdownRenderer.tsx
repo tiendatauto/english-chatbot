@@ -224,7 +224,7 @@ const components = (noSplit: boolean) => ({
 
 export default function MarkdownRenderer({
   children,
-  noSplit = false,
+  noSplit = true,
 }: MarkdownRendererProps) {
   return (
     <article className="prose max-w-none dark:prose-invert">

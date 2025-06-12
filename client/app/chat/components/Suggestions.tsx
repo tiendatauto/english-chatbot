@@ -8,6 +8,7 @@ interface SuggestionsProps {
   isProcessing: boolean;
 }
 
+const mock = ["gợi ý 1", "gợi ý 2"];
 export default function Suggestions({
   suggestions,
   onSuggestionClick,
@@ -19,7 +20,8 @@ export default function Suggestions({
 
   const checkScrollButtons = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
     }
@@ -62,7 +64,7 @@ export default function Suggestions({
         onScroll={checkScrollButtons}
         className="flex overflow-x-auto space-x-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none]"
       >
-        {suggestions.map((suggestion, index) => (
+        {mock.map((suggestion, index) => (
           <motion.button
             key={index}
             onClick={() => !isProcessing && onSuggestionClick(suggestion)}
