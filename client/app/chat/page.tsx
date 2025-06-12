@@ -278,7 +278,9 @@ export default function ChatPage() {
         });
         const data = await res.json();
         setTranscriptApi(data.transcript);
-        data && setIsListening(false);
+        if (data) {
+          setIsListening(false);
+        }
       };
 
       mediaRecorderRef.current.start();
