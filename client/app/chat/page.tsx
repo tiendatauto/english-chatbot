@@ -39,6 +39,9 @@ export default function ChatPage() {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [transcriptApi, setTranscriptApi] = useState(transcript);
+
+  console.log("transcriptApi", transcriptApi);
 
   useEffect(() => {
     if (!preferences.hasCompletedOnboarding) {
@@ -246,19 +249,33 @@ export default function ChatPage() {
     cancel();
     resetTranscript();
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorderRef.current = stream && new MediaRecorder(stream);
+    mediaRecorderRef.current =
+      stream &&
+      new MediaRecorder(stream, {
+        mimeType: "audio/webm;codecs=opus",
+      });
     audioChunksRef.current = [];
 
     mediaRecorderRef.current.ondataavailable = (event) => {
       audioChunksRef.current.push(event.data);
     };
 
-    mediaRecorderRef.current.onstop = () => {
+    mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current, {
         type: "audio/webm",
       });
       const url = URL.createObjectURL(audioBlob);
       setAudioURL(url);
+      const urlApi = new URL(`${API_DOMAIN}/api/chat/whisper`);
+
+      const formData = new FormData();
+      formData.append("file", audioBlob, "speech.webm");
+      const res = await fetch(urlApi.toString(), {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      setTranscriptApi(data.transcript);
     };
 
     mediaRecorderRef.current.start();
