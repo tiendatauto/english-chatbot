@@ -284,7 +284,7 @@ export default function ChatPage() {
       mediaRecorderRef.current.start();
       SpeechRecognition.startListening({ continuous: true });
     } catch (error) {
-      console.log("error");
+      console.log("error", error);
     }
   };
 
