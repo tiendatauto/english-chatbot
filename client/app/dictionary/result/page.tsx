@@ -197,7 +197,7 @@ function DictionaryResultContent() {
               </div>
             ) : result ? (
               <div className="animate-fadeIn">
-                <MarkdownRenderer>{result.content}</MarkdownRenderer>
+                <MarkdownRenderer noSplit>{result.content}</MarkdownRenderer>
               </div>
             ) : (
               <div className="text-center text-slate-600 dark:text-slate-400">

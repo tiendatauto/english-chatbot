@@ -12,6 +12,7 @@ import * as XLSX from "xlsx";
 
 export interface MarkdownRendererProps {
   children: string;
+  noSplit?: boolean;
 }
 
 interface ComponentProps {
@@ -29,53 +30,62 @@ interface CodeProps {
   children?: ReactNode;
 }
 
-const components = {
+const components = (noSplit: boolean) => ({
   h1: ({ children }: ComponentProps) => (
     <h1
       className="text-3xl lg:text-4xl font-black py-3 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent relative
     after:content-[''] after:absolute after:bottom-0.5 after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-purple-600 after:via-pink-500 after:to-blue-500 after:rounded-full after:opacity-75
     hover:scale-100 transition-transform duration-300"
     >
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </h1>
   ),
   h2: ({ children }: ComponentProps) => (
-    <h2 className="text-xl font-bold py-2">{renderChildComponent(children)}</h2>
+    <h2 className="text-xl font-bold py-2">
+      {" "}
+      {noSplit ? children : renderChildComponent(children)}
+    </h2>
   ),
   h3: ({ children }: ComponentProps) => (
-    <h3 className="text-lg font-bold py-2">{renderChildComponent(children)}</h3>
+    <h3 className="text-lg font-bold py-2">
+      {" "}
+      {noSplit ? children : renderChildComponent(children)}
+    </h3>
   ),
   h4: ({ children }: ComponentProps) => (
-    <h4 className="font-bold py-1">{renderChildComponent(children)}</h4>
+    <h4 className="font-bold py-1">
+      {" "}
+      {noSplit ? children : renderChildComponent(children)}
+    </h4>
   ),
   p: ({ children }: ComponentProps) => (
     <p className="my-2 text-sm md:text-base text-white-600 dark:text-white-400 flex flex-wrap">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </p>
   ),
   ul: ({ children }: ComponentProps) => (
     <ul className="my-2 list-disc pl-4 marker:text-white-500 text-sm md:text-base text-white-600 dark:text-white-400">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </ul>
   ),
   ol: ({ children }: ComponentProps) => (
     <ol className="my-2 list-decimal pl-4 marker:text-white-500 text-sm md:text-base text-white-600 dark:text-white-400">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </ol>
   ),
   li: ({ children }: ComponentProps) => (
     <li className="my-2 relative before:absolute before:left-[-1.5em] before:text-white-500 before:font-bold md:text-base text-white-600 dark:text-white-400">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </li>
   ),
   strong: ({ children }: ComponentProps) => (
     <strong className="font-bold text-white-800 dark:text-white-200">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </strong>
   ),
   blockquote: ({ children }: ComponentProps) => (
     <blockquote className="my-2 border-l-4 border-blue-500/50 pl-4 not-italic text-sm md:text-base text-white-600 dark:text-white-400">
-      {renderChildComponent(children)}
+      {noSplit ? children : renderChildComponent(children)}
     </blockquote>
   ),
   a: ({ href, children }: LinkProps) => (
@@ -210,12 +220,18 @@ const components = {
       {children}
     </td>
   ),
-};
+});
 
-export default function MarkdownRenderer({ children }: MarkdownRendererProps) {
+export default function MarkdownRenderer({
+  children,
+  noSplit = false,
+}: MarkdownRendererProps) {
   return (
     <article className="prose max-w-none dark:prose-invert">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={components(noSplit)}
+      >
         {children}
       </ReactMarkdown>
     </article>
