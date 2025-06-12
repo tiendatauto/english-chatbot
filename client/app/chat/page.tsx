@@ -283,7 +283,9 @@ export default function ChatPage() {
 
       mediaRecorderRef.current.start();
       SpeechRecognition.startListening({ continuous: true });
-    } catch {}
+    } catch (error) {
+      console.log("error");
+    }
   };
 
   // Dừng ghi âm
