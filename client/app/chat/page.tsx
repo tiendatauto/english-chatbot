@@ -39,9 +39,8 @@ export default function ChatPage() {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [transcriptApi, setTranscriptApi] = useState(transcript);
-
-  console.log("transcriptApi", transcriptApi);
+  const [transcriptApi, setTranscriptApi] = useState("");
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     if (!preferences.hasCompletedOnboarding) {
@@ -158,7 +157,7 @@ export default function ChatPage() {
   };
 
   const handleSend = async (message = inputMessage) => {
-    if ((!message.trim() && !transcript) || isProcessing) {
+    if ((!message.trim() && !transcript && !transcriptApi) || isProcessing) {
       return;
     }
 
@@ -166,7 +165,7 @@ export default function ChatPage() {
       selectedImages.length > 0 ? getImageUrls(selectedImages) : undefined;
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: message || transcript,
+      content: message || transcriptApi,
       sender: "user",
       timestamp: new Date(),
       images: imageUrls,
@@ -178,10 +177,11 @@ export default function ChatPage() {
     setIsProcessing(true);
 
     resetTranscript();
+    setTranscriptApi("");
     setAudioURL(null);
     try {
       const requestData = {
-        message: message.trim() || transcript,
+        message: message.trim() || transcriptApi,
       };
 
       const headers: HeadersInit = {
@@ -240,46 +240,50 @@ export default function ChatPage() {
   };
 
   const startRecording = async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert(
-        "Trình duyệt không hỗ trợ ghi âm (getUserMedia). Vui lòng dùng Chrome trên Android hoặc Safari mới nhất."
-      );
-      return;
-    }
-    cancel();
-    resetTranscript();
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorderRef.current =
-      stream &&
-      new MediaRecorder(stream, {
-        mimeType: "audio/webm;codecs=opus",
-      });
-    audioChunksRef.current = [];
+    setIsListening(true);
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert(
+          "Trình duyệt không hỗ trợ ghi âm (getUserMedia). Vui lòng dùng Chrome trên Android hoặc Safari mới nhất."
+        );
+        return;
+      }
+      cancel();
+      resetTranscript();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current =
+        stream &&
+        new MediaRecorder(stream, {
+          mimeType: "audio/webm;codecs=opus",
+        });
+      audioChunksRef.current = [];
 
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      audioChunksRef.current.push(event.data);
-    };
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
 
-    mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: "audio/webm",
-      });
-      const url = URL.createObjectURL(audioBlob);
-      setAudioURL(url);
-      const urlApi = new URL(`${API_DOMAIN}/api/chat/whisper`);
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURL(url);
+        const urlApi = new URL(`${API_DOMAIN}/api/chat/whisper`);
 
-      const formData = new FormData();
-      formData.append("file", audioBlob, "speech.webm");
-      const res = await fetch(urlApi.toString(), {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      setTranscriptApi(data.transcript);
-    };
+        const formData = new FormData();
+        formData.append("file", audioBlob, "speech.webm");
+        const res = await fetch(urlApi.toString(), {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setTranscriptApi(data.transcript);
+        data && setIsListening(false);
+      };
 
-    mediaRecorderRef.current.start();
-    SpeechRecognition.startListening({ continuous: true });
+      mediaRecorderRef.current.start();
+      SpeechRecognition.startListening({ continuous: true });
+    } catch {}
   };
 
   // Dừng ghi âm
@@ -289,10 +293,10 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
-    if (!transcript) {
+    if (!transcript && !transcriptApi) {
       setAudioURL(null);
     }
-  }, [transcript]);
+  }, [transcript, transcriptApi]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400 via-purple-400 to-blue-600">
@@ -320,9 +324,14 @@ export default function ChatPage() {
           )}
 
           <ChatInput
-            inputMessage={inputMessage || transcript}
+            inputMessage={
+              isListening ? "listening..." : inputMessage || transcriptApi
+            }
             onInputChange={setInputMessage}
-            resetTranscript={resetTranscript}
+            resetTranscript={() => {
+              resetTranscript();
+              setTranscriptApi("");
+            }}
             onSend={() => handleSend()}
             isProcessing={isProcessing}
             selectedImages={selectedImages}
