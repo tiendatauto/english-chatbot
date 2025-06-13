@@ -84,14 +84,14 @@ export default function ChatPage() {
             <button
               onClick={startRecording}
               disabled={isListening}
-              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+              className="font-semibold items-center w-full text-center space-x-2 px-6 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200"
             >
               🎙️ Start Speaking
             </button>
             <button
               onClick={stopRecording}
               disabled={!isListening}
-              className="text-slate-600 dark:text-slate-400 flex items-center justify-center sm:space-x-2 rounded-lg px-3 py-1.5 transition-all dark:bg-slate-700 bg-slate-100 w-full"
+              className="font-semibold items-center w-full text-center space-x-2 px-6 py-2 rounded-lg bg-gradient-to-r bg-red-500 to-amber-400 hover:from-red-600 hover:to-amber-500 text-white transition-all duration-200"
             >
               🛑 Stop
             </button>
@@ -99,7 +99,7 @@ export default function ChatPage() {
 
           <p>Status: {isListening ? "🎤 Listening..." : "🛑 Not Listening"}</p>
 
-          {audioURL && (
+          {audioURL && !isListening && (
             <div style={{ marginTop: 10 }}>
               <strong>🔁 Your Voice:</strong>
               <audio controls src={audioURL}></audio>
