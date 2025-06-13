@@ -1,12 +1,10 @@
 # EngChat: AI-powered English Learning Platform
 
-EngChat is a modern web application designed to help Vietnamese learners improve their English skills through interactive AI-powered features. The platform provides smart dictionary lookups, AI chat for speaking practice, writing evaluation, and assignment generation, all tailored to the user's proficiency level.
+EngChat is a modern web application designed to help Vietnamese learners improve their English skills through interactive AI-powered features. The platform provides smart dictionary lookups, AI chat for speaking and conversation practice,all tailored to the user's proficiency level.
 
 ## Features
 - **Smart Dictionary**: Look up words, idioms, and phrasal verbs with context-aware explanations, IPA, and audio pronunciation.
 - **AI Chat Tutor**: Practice English conversation with an AI tutor (powered by GPT-4), which always responds in English to help improve speaking and reflexes.
-- **Writing Practice**: Submit essays and receive instant feedback and scoring.
-- **Assignment Generator**: Create and solve English assignments based on your level and interests.
 - **Personalized Experience**: Onboarding flow to collect user info and adapt content accordingly.
 - **Modern UI/UX**: Responsive, dark mode, and beautiful design using Tailwind CSS and ShadCN UI.
 
