@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Sparkles, Search, Volume2 } from "lucide-react";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
+import Navbar from "@/components/Navbar";
 import { API_DOMAIN } from "@/lib/config";
 import { getUserPreferences } from "@/lib/localStorage";
-import Navbar from "@/components/Navbar";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { ArrowLeft, Search, Sparkles, Volume2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSpeechSynthesis } from "react-speech-kit";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -18,13 +19,12 @@ interface DictionaryResponse {
 function DictionaryResultContent() {
   const [result, setResult] = useState<DictionaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState<number | null>(null);
-  const [playError, setPlayError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword");
   const context = searchParams.get("context");
+  const { speak, speaking } = useSpeechSynthesis();
 
   useEffect(() => {
     if (!isBrowser) return;
@@ -79,60 +79,27 @@ function DictionaryResultContent() {
     fetchResult();
   }, [keyword, context, router]);
 
-  const playAudio = async (url: string, index: number) => {
-    try {
-      setPlayError(null);
-      setIsPlaying(index);
-      const audio = new Audio(url);
-
-      audio.addEventListener("ended", () => {
-        setIsPlaying(null);
-      });
-
-      audio.addEventListener("error", () => {
-        setIsPlaying(null);
-        setPlayError(`Không thể phát âm thanh #${index + 1}`);
-      });
-
-      await audio.play();
-    } catch (error) {
-      console.error("Error playing audio:", error);
-      setIsPlaying(null);
-      setPlayError(`Không thể phát âm thanh #${index + 1}`);
-    }
-  };
-
   const renderAudioButtons = () => {
-    if (!result?.audioUrls) {
-      return null;
-    }
-
     return (
       <div className="flex flex-col items-end gap-2">
         <div className="flex items-center gap-2">
-          {[result.audioUrls].map((url, index) => (
-            <button
-              key={index}
-              onClick={() => playAudio(url?.us, index)}
-              className={`flex items-center space-x-2 rounded-lg bg-white/80 px-4 py-2 text-slate-600 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white ${
-                isPlaying === index
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 !text-white"
-                  : ""
+          <button
+            onClick={() => keyword && speak({ text: keyword })}
+            className={`flex items-center space-x-2 rounded-lg bg-white/80 px-4 py-2 text-slate-600 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white ${
+              speaking
+                ? "bg-gradient-to-r from-purple-500 to-pink-500 !text-white"
+                : ""
+            }`}
+            title={speaking ? "Đang phát..." : "Phát âm"}
+            disabled={speaking !== null}
+          >
+            <Volume2
+              className={`h-5 w-5 ${
+                speaking ? "text-white animate-pulse" : ""
               }`}
-              title={isPlaying === index ? "Đang phát..." : "Phát âm"}
-              disabled={isPlaying !== null}
-            >
-              <Volume2
-                className={`h-5 w-5 ${
-                  isPlaying === index ? "text-white animate-pulse" : ""
-                }`}
-              />
-            </button>
-          ))}
+            />
+          </button>
         </div>
-        {playError && (
-          <p className="text-sm text-red-500 dark:text-red-400">{playError}</p>
-        )}
       </div>
     );
   };

@@ -216,12 +216,12 @@ class DictionaryController {
       const result = await model.generateContent(prompt(req.body))
       const content = result.response.text()
 
-      const { ipa, audioUrls } = await dictionaryController.getIPAAndAudio(keyword)
+      // const { ipa, audioUrls } = await dictionaryController.getIPAAndAudio(keyword)
 
       const response = {
         word: keyword,
-        ipa,
-        audioUrls,
+        // ipa,
+        // audioUrls,
         content
       }
 
