@@ -1,12 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import ProficiencyForm from "@/components/ProficiencyForm";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,8 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { API_DOMAIN } from "@/lib/config";
-import ProficiencyForm from "@/components/ProficiencyForm";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Tên không hợp lệ"),
@@ -50,23 +49,6 @@ export default function OnboardingForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      setIsLoading(true);
-      // setError("");
-
-      // Health check API call
-      const response = await fetch(`${API_DOMAIN}/api/Healthcheck`, {
-        method: "GET",
-        // headers: {
-        //   accept: "text/plain",
-        //   Authentication: data.geminiApiKey,
-        // },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Health check failed");
-      }
-
       // If health check succeeds, proceed
       setFormData(data);
       setCurrentStep(2);

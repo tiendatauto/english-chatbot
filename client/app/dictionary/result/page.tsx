@@ -91,7 +91,6 @@ function DictionaryResultContent() {
                 : ""
             }`}
             title={speaking ? "Đang phát..." : "Phát âm"}
-            disabled={speaking !== null}
           >
             <Volume2
               className={`h-5 w-5 ${
